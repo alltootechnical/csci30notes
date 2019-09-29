@@ -1,0 +1,434 @@
+\chapter{Efficiency}
+\label{chap:efficiency}
+
+In the latter part of your \subject{CSci}{20} class,\footnote{For the remaining students under the old curriculum, \subject{CSci}{20} (called \textit{Introduction to Computing}) is a new course for freshmen. It is pretty much like the CS counterpart of \subject{MIS}{101}.} you talked about the essence of what computing is all about, i.e., what does it exactly mean that a problem is \textit{computable}. More often than not, these problems are considered solved when we can construct an abstract machine such as a finite automaton or a Turing machine that can solve them.
+
+However in this course, we would also like to ask ``What does it mean for a solution to a problem (or a program) to be \textit{efficient}?'' 
+
+In this chapter, we will explore methods to determine the efficiency of an algorithm, as well as establish notations to more conveniently describe efficiency.
+
+\section{Towards defining efficiency}
+What does it mean for an algorithm to be efficient? We all have this general idea of efficiency that an algorithm should not use any more of the computer's resources than necessary. 
+
+Since the real world we live in is finite and limited, we cannot afford to use solutions that unnecessarily expend a lot of resources. So there is a need to efficiently allocate resources so that more of those can be used in the future. 
+
+In the field of computing, our main resources are \textit{time} and \textit{space}. More specifically, time refers to how long an algorithm takes to run, while space refers to how much memory an algorithm consumes.
+
+Let us formalize our notion of what an efficient algorithm is by proposing the following definition.
+\begin{claim}[Proposed definition \#1, from \cite{kleinberg_algorithm_2006}]
+An algorithm is efficient if, when implemented, it runs quickly on real input instances.
+\end{claim}
+
+But wait, what do we mean by ``quickly'' here?
+
+% It is not enough that a program is \textit{provably correct}, but also it must be \textit{provably efficient}.
+
+\section{Measuring efficiency}
+\label{sec:measuring-efficiency}
+
+How do we measure efficiency? In real life, engineers often use \textit{benchmarks} to ensure that their work conforms to a standard. They repeatedly take measurements of different properties while manipulating or tweaking some of the variables and observe the outcomes. 
+
+Recall that a program takes in some input and gives out some output, but the way time and memory are consumed are very much dependent on how the program deals or what the program does on the given input. So we usually measure efficiency in terms of time and memory consumption.
+
+More concretely, we can measure the execution time of a program using built-in methods such as \texttt{System.currentTimeMillis()} in Java and \texttt{timeit.timeit()} in Python.
+
+\begin{example}[Benchmarking]
+\label{ex:running_time}
+
+% [TO-DO: Rewrite this example!]
+
+Here we have two functions that both compute the sum of integers from $1$ to $n$.
+
+% \begin{listing}[H]
+% \begin{minted}{python}
+% def int_sum(n):
+%     S = 0
+%     for i in range(1, n+1):
+%         S += i
+%     return S
+% \end{minted}
+% \caption{Get the sum of all integers from $1$ to $n$}
+% \label{lst:int_sum}
+% \end{listing}
+\begin{minipage}{0.45\textwidth}
+\begin{listing}[H]
+\begin{minted}{python}
+def intsum(n):
+    S = 0
+    for i in range(1, n+1):
+        S = S + i
+    return S
+\end{minted}
+\label{lst:intsum}
+\end{listing}
+\end{minipage}\hfill
+\begin{minipage}{0.45\textwidth}
+\begin{listing}[H]
+\begin{minted}{python}
+def intsum2(n):
+    return n*(n+1)//2
+\end{minted}
+\label{lst:intsum2}
+\end{listing}
+\end{minipage}
+
+Try running both \texttt{intsum} and \texttt{intsum2} with succeeding powers of $10$, starting from $1$, $10$, $100$, $1000$, and so on. What do you notice? Does the program take a little bit longer for large values of $n$?
+
+If we record the actual running time of the program for each power of $10$, we get the following plot shown in Figure~\ref{fig:intsum_runtime}.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+		\begin{loglogaxis}[
+		    width=0.8\textwidth,
+		    height=8cm,
+			xmin=1, xmax=1e9,
+			ymin=1e-6, ymax=100,
+			xlabel={$n$}, 
+			ylabel={Running time (seconds)},
+			grid=major,
+			legend pos=north west,
+			legend cell align=left,
+			tick scale binop=\times
+		]
+		\addplot[thick, attblue, mark=*] table[x=n, y=intsum] {plots/intsum.txt};
+		\addplot[thick, attred, mark=*] table[x=n, y=intsum2] {plots/intsum.txt};
+		\legend{\texttt{intsum},\texttt{intsum2}}
+		\end{loglogaxis}
+	\end{tikzpicture}%
+	\label{fig:intsum_runtime}
+\end{figure}
+
+% \begin{figure}[H]
+% 	\centering
+% 	\begin{tikzpicture}
+% 		\begin{loglogaxis}[
+% 		    width=0.8\textwidth,
+% 			xmin=1, xmax=1e9,
+% 			ymin=1e-6, ymax=100,
+% 			xlabel={$n$}, ylabel={Running time (sec)},
+% 			grid=major,
+% 			legend pos=south east,
+% 			legend cell align=left,
+% 			tick scale binop=\times
+% 		]
+% 		\addplot[thick, attblue, only marks] table[x=n, y=time] {plots/intsum_runtime.txt};
+% 		\addplot[thick, attblue] table[x=n, y=time] {plots/intsum_runtime.txt};
+% 		\end{loglogaxis}
+% 	\end{tikzpicture}%
+% 	\caption{Running time of \texttt{int\_sum}}
+% 	\label{fig:int_sum_runtime}
+% \end{figure}
+
+% Note that the points are plotted with a log-log scale, so if it seems that they follow a linear trend, it is actually an \textit{exponential} trend. As the input $n$ increases by a tenfold, the running time will also increase by a tenfold. Running \texttt{int\_sum(10000000)} takes around half a second, while \texttt{int\_sum(100000000)} takes about $5$ seconds, and \texttt{int\_sum(1000000000)} takes about $50$ seconds to run.
+\end{example}
+
+The problem with benchmarking when it comes to computer programs is that not all computers are created equally; the specifications and parts within it wildly differ from one computer to another. Some programs might run quickly on one computer, but very slowly in another. You need to have the same machine setup every time you compare algorithms. In other words, \textbf{efficiency is relative to physical constraints.}
+
+% ripped off from ASPC-B 2018 slides
+Another problem is that we have to implement code first, and for many people this is a waste of time. When you write code, chances are you simply end up tweaking the code, thus you would not gain any insight on why the program is slow, or even how to design faster programs in the first place. 
+
+% ripped off from ASPC-B 2018 slides
+You may be thinking, ``My program is really not that slow, you just need a faster computer!'' But how do we build faster computers? ``You just need to buy faster parts!'' But how do we build faster parts? ``You just need to get faster materials!'' But how do we get faster materials? ``You just need... \textit{to get a faster universe!}''
+
+\section{Model of computation}
+Instead of looking at the actual running time of each of the operations, let us assume that the operations have a fixed cost at some level. Which operations we consider available and their respective costs form a particular \textit{model of computation}. 
+
+Now, efficiency is dependent on the algorithm that the program uses, that is, it is now dependent on how the higher-level operations are implemented with lower-level operations.
+
+We can measure program efficiency like this:
+\begin{enumerate}
+    \item Choose a set of operations that we consider to have a fixed cost.
+    \item Measure the average cost for each of those operations.
+    \item Count number of operations we perform for each type of operation.
+    \item Then the total cost would be the sum of the number of operations times the cost of the operation, over all operations.
+\end{enumerate}
+
+But we can do better! We could actually do away with measuring in terms of seconds or bytes, since the actual numbers would be heavily dependent on the hardware. Instead, we choose a set of operations such that they would have the same average cost. Then the total cost would simply be equal to the total number of operations.
+
+For this course, we will be using what is called the \textit{random-access machine} model of computation, or the RAM model for short.
+\begin{definition}
+The random-access machine (RAM) model of computation assumes that the following primitive operations have a cost of $1$:
+\begin{enumerate}
+    \item assigning a value to a variable,
+    \item fetching the value of a variable,
+    \item calling a method or function,
+    \item performing an arithmetic operation,
+    \item comparing two values,
+    \item indexing into an array,
+    \item following an object reference, and
+    \item returning from a method.
+\end{enumerate}
+\end{definition}
+
+\begin{example}[Counting operations]
+\label{ex:countingops}
+
+We consider \texttt{int\_sum} as shown in Listing~\ref{lst:int_sum}, but we rewrite it first using pseudocode.
+\begin{algorithm}[H]
+    \label{alg:intsum}
+    \caption{Calculate the sum of all integers from $1$ to $n$}
+    \begin{algorithmic}[1]
+        \Require An integer $n$
+        \Ensure The sum $S$ of all integers from $1$ to $n$
+        \Function{IntSum}{$n$}
+            \State $S \gets 0$
+            \For{$i \gets 1$ to $n$}
+            \State $S \gets S+i$
+            \EndFor
+            \Return $S$
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+
+Before we can start counting the number of operations, we need to establish what model of computation to use. In our case, we will use the RAM model as defined earlier.
+
+To make things easier, we will rewrite the for loop in \textsc{IntSum} using a while loop as shown in Algorithm~\ref{alg:intsumwhile}. It is not hard to see that both are equivalent.
+
+\begin{algorithm}[H]
+    \label{alg:intsumwhile}
+    \caption{Calculate the sum of all integers from $1$ to $n$}
+    \begin{algorithmic}[1]
+        \Require An integer $n$
+        \Ensure The sum $S$ of all integers from $1$ to $n$
+        \Function{IntSum}{$n$}
+            \State $S \gets 0$
+            \State $i \gets 1$
+            \While{$i \le n$}
+            \State $S \gets S+i$
+            \State $i \gets i+1$
+            \EndWhile
+            \Return $S$
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+
+We can already see $2$ assignment operations that initialize the values of $S$ and $i$. There are also $2$ assignment operations inside the while loop, which updates the value of $S$ and increments the value of $i$. Since the loop goes through $n$ iterations, there are $2n$ assignments in total. Overall, \textsc{IntSum} has $2n+2$ assignment operations.
+
+In the loop, we fetch the values of $i$ and $n$, as well as the values of $S$ and $i$ to update $S$, and $i$ again to increment its value. Then we have $5$ variable fetch operations, but those are happening within the loop, so we have $5n$ variable fetch operations in total. But before we exit the loop, we check the condition one last time, which involves fetching the values of $i$ and $n$. Overall, \textsc{IntSum} has $5n+2$ variable fetch operations.
+
+Additionally (pun intended), there are $2$ addition operations in the loop, one for adding $i$ to $S$ and another one for incrementing $i$, i.e. adding $1$ to $i$. These are done per iteration, so there are $2n$ addition operations overall.
+
+For each iteration of the loop, a single comparison operation is done for comparing the values of $i$ and $n$, for a total of $n$ comparison operations. Before exiting the loop, we check the condition one last time, which also involves a comparison. Thus \textsc{IntSum} has $n+1$ comparison operations.
+
+To get the total number of operations in \textsc{IntSum}, we simply get the sum per operation, so \textsc{IntSum} has $T\left(n\right) = \left(2n+2\right) + \left(5n+2\right) + 2n + \left(n+1\right) + 1 = \boxed{10n+6}$ operations all in all.
+\end{example}
+
+In the preceding example, we have shown that the \textit{running time} of \textsc{IntSum} is $T\left(n\right) = 10n+6$. Notice that the number of operations grows as the input gets larger, that is why it is a function of the input size.
+
+So here's the takeaway: \textbf{efficiency only matters when the input size is large.} As the size of the input gets larger, the lower-order terms will be overshadowed by the highest-order term.
+
+\section{Orders of growth}
+
+In the previous section, we have seen how the size of the input affects the running time of an algorithm. But it is also possible that the running time changes even when two different inputs of the same size are given.
+
+\begin{example}[Searching in a list]
+\label{ex:searching-list}
+We have the following algorithm to find an element in some list. If such an element is found, it will return its (one-based) position in the list. Otherwise, it returns $0$.
+
+\begin{algorithm}[H]
+    \label{alg:search-element}
+    \caption{Get the index of an element $e$ in a list $L$, if it exists}
+    \begin{algorithmic}[1]
+        \Function{SearchElement}{$L$, $e$}
+            \For{$i \gets 1$ to $\left|L\right|$}
+            \Comment{$\left|L\right|$ is the length of the list $L$}
+                \If{$L_i = e$}
+                    \Return $i$
+                \EndIf
+            \EndFor
+            \Return $0$
+            \Comment{if $e$ is not found in $L$}
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+
+Suppose we want to search in the list $\List{50,84,1,96,5}$. For which inputs can we achieve the minimum running time? In other words, which values of $e$ can we give so that \textsc{Search-Element} runs with the fewest number of operations?
+
+Since the for loop checks the list from the first element to the last element, if the first element is equal to $e$, then the algorithm returns $1$ and terminates. We did not need to deal with the remaining elements! So we consider this as the algorithm's \textit{best case}.
+
+Now let's determine the best case running time of \textsc{Search-Element}. We are still going to use the same model of computation that we have in Example~\ref{ex:countingops}.
+
+What would happen if $e$ is not in the list?
+
+\end{example}
+
+Do we \textit{really} need to know the exact number of operations? Even minor changes to the implementation of an algorithm can change its running time.
+
+However, if we were to analyze larger and more complicated programs for efficiency, counting the number of operations can get very difficult very quickly. In some cases, it may not even be possible at all to determine the exact running time of a program, and so it will not be worth the effort.
+
+Maybe we only care about how \textit{fast} the running time grows. Instead of saying that ``the running time of \textsc{IntSum} is $10n+6$,'' it's enough to say that ``the running time of \textsc{IntSum} grows proportionally to $n$.'' Our goal, then, is to simplify algorithm analysis by getting rid of irrelevant information. How?
+
+\section{Asymptotic analysis}
+\label{sec:asymptotic}
+
+When we are dealing with input sizes that are large enough so that only the rate of growth of the running time matters, we are looking at the \textit{asymptotic} efficiency of an algorithm. Why call it ``asymptotic?'' If you recall your lesson about conic sections in your precalculus class, you have encountered the concept of an asymptote, which comes from the Greek word meaning ``not falling together.'' 
+
+Just like how a curve \textit{almost} approaches an asymptote but never touches it, we say that two functions are \textit{asymptotically equal} if they \textit{almost} approach one another but never intersect at a later point.\footnote{Formally speaking, we say that two functions $f$ and $g$ are asymptotically equal (sometimes denoted as $f \sim g$) if and only if $\lim_{x \to \infty}{\frac{f\left(x\right)}{g\left(x\right)}}$ exists and is equal to $1$. But you don't need to know this fact for this course.} We can see this in action in the following example.
+
+\begin{example}[Comparing growth of functions]
+% \url{https://www.desmos.com/calculator/k4p7sewkq2}
+
+Suppose we have some algorithm that has a running time of $T\left(n\right) = n^2 + 3n + 2$. We want to compare how it grows as input size $n$ gets larger along with other functions like $f\left(n\right) = n^2$, $g\left(n\right) = n$, and $h\left(n\right) = 2^n$ by sketching their plots, as shown in Figure~\ref{fig:growth_comp}. \footnote{An interactive version of the plots is also available at \url{https://www.desmos.com/calculator/k4p7sewkq2}.}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+		    width=0.8\textwidth,
+			xmin=0, xmax=4,
+			ymin=0, ymax=6,
+			xlabel={$n$}, ylabel={Running time},
+			grid=major,
+			legend pos=south east,
+			legend cell align=left
+		]
+		\addplot[ultra thick, attblue, samples=100]  {x^2 + 3*x + 2};
+		\addplot[thick, attyellow, samples=100]  {x^2};
+		\addplot[thick, attred, samples=100]  {x};
+		\addplot[thick, attgreen, samples=100]  {2^x};
+		\legend{$T\left(n\right)$, $f\left(n\right)$, $g\left(n\right)$, $h\left(n\right)$}
+		\end{axis}
+	\end{tikzpicture}%
+	\caption{Growth of $T\left(n\right)$ compared to $f\left(n\right)$, $g\left(n\right)$, and $h\left(n\right)$}
+	\label{fig:growth_comp}
+\end{figure}
+
+As expected, the four plots all look different. But if we zoom out further as in Figure~\ref{fig:growth_comp_zoomout}, we get the following.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+		    width=0.8\textwidth,
+			xmin=0, xmax=20,
+			ymin=0, ymax=200,
+			xlabel={$n$}, ylabel={Running time},
+			grid=major,
+			legend pos=south east,
+			legend cell align=left
+		]
+		\addplot[ultra thick, attblue, samples=100, domain=0:20]  {x^2 + 3*x + 2};
+		\addplot[thick, attyellow, samples=100, domain=0:20]  {x^2};
+		\addplot[thick, attred, samples=100, domain=0:20]  {x};
+		\addplot[thick, attgreen, samples=100, domain=0:8]  {2^x};
+		\legend{$T\left(n\right)$, $f\left(n\right)$, $g\left(n\right)$, $h\left(n\right)$}
+		\end{axis}
+	\end{tikzpicture}%
+	\caption{Growth of $T\left(n\right)$ compared to $f\left(n\right)$, $g\left(n\right)$, and $h\left(n\right)$}
+	\label{fig:growth_comp_zoomout}
+\end{figure}
+
+As before, the plot of $T\left(n\right)$ still looks different from both $g\left(n\right)$ and $h\left(n\right)$, but notice that both $T\left(n\right)$ and $f\left(n\right)$ look the same, as if they are almost approaching (or closely following) one another.
+
+\end{example}
+
+
+\subsection{$\Theta$-notation}
+\begin{definition}[\cite{cormen_introduction_2009}]
+For a given function $g \left(n\right)$, we denote by $\bigTheta{g \left(n\right)}$ the set of functions
+\[
+\bigTheta{g \left(n\right)} = \left\{f\left(n\right) \mid \exists c_1, c_2, n_0 > 0 \text{ such that } 0 \le c_1 \cdot g \left(n\right) \le f \left(n\right) \le c_2 \cdot g \left(n\right) \text{ for all } n \ge n_0 \right\}.
+\]
+\end{definition}
+
+\subsection{$O$-notation}
+\begin{definition}[\cite{cormen_introduction_2009}]
+For a given function $g \left(n\right)$, we denote by $\bigO{g \left(n\right)}$ (pronounced ``big-oh of $g$ of $n$'' or sometimes just ``oh of $g$ of $n$'') the set of functions
+\[
+\bigO{g \left(n\right)} = \left\{f\left(n\right) \mid \exists c, n_0 > 0 \text{ such that } 0 \le f \left(n\right) \le c \cdot g \left(n\right) \text{ for all } n \ge n_0 \right\}.
+\]
+\end{definition}
+
+\subsection{$\Omega$-notation}
+\begin{definition}[\cite{cormen_introduction_2009}]
+For a given function $g \left(n\right)$, we denote by $\bigOmega{g \left(n\right)}$ (pronounced ``big-omega of $g$ of $n$'' or sometimes just ``omega of $g$ of $n$'') the set of functions
+\[
+\bigOmega{g \left(n\right)} = \left\{f\left(n\right) \mid \exists c, n_0 > 0 \text{ such that } 0 \le c \cdot g \left(n\right) \le f \left(n\right) \text{ for all } n \ge n_0 \right\}.
+\]
+\end{definition}
+
+\begin{theorem}[\cite{cormen_introduction_2009}]
+\label{thm:bigtheta}
+For any two functions $f\left(n\right)$ and $g\left(n\right)$, we have $f\left(n\right) = \bigTheta{g \left(n\right)}$ if and only if $f\left(n\right) = \bigO{g \left(n\right)}$ and $f\left(n\right) = \bigOmega{g \left(n\right)}$.
+\end{theorem}
+
+\begin{exercises}
+\begin{enumerate}
+    \item The following algorithm counts the number of multiples of $1, 2, 3, \ldots, n$ from an array $A$ of $n$ integers (indexed $1$ to $n$), and stores and returns the counts in a separate array.
+    \begin{algorithm}[H]
+        \caption{Count the number of multiples of $1, 2, 3, \ldots, n$ given an array}
+        \begin{algorithmic}[1]
+            \Function{CountMultiples}{$A$}
+            \For{$m \gets 1$ to $n$}
+                \State $\mathrm{count}[m] \gets 0$
+            \EndFor
+            % \State $\mathrm{count}_1 \gets n$
+            % \Comment{all numbers are divisible by $1$}
+            \For{$i \gets 1$ to $n$}
+                \For{$m \gets 1$ to $n$}
+                    \If{$A[i] \bmod{m} = 0$}
+                        \State $\mathrm{count}[m] \gets \mathrm{count}[m] + 1$
+                    \EndIf
+                \EndFor
+            \EndFor
+            \Return $\mathrm{count}$
+            \EndFunction
+        \end{algorithmic}
+    \end{algorithm}
+    \begin{enumerate}
+        \item Suppose our input array is $\List{10,17,8,240,15}$. \textbf{Exactly} how many operations are carried out? Determine the number of operations attributable for each line, then get the total at the end.
+        \item For an array of length $n$ (assume worst-case), how many operations are carried out? Determine the number of operations attributable for each line, then get the total at the end. Provide your answers in terms of $n$.
+        \item Express the worst-case running time (i.e., total number of operations) using big-$O$ notation.
+        
+    \end{enumerate}
+    
+    \item Prove or disprove each of the following:
+    \begin{enumerate}
+        \item $3^n + 100n^2 + n^{200}$ is $\bigO{2^n}$
+        \item $2\sqrt{n} + 34$ is $\bigO{n^2}$
+        \item $6n \log{n} + 4n$ is $\bigO{n}$
+        \item $n^3 + n^2 \log{n} + n \sqrt{n}$ is $\bigO{n^3}$
+        \item $4^{n-1}$ is $\bigO{3^{n+1}}$
+    \end{enumerate}
+    
+    \item (\cite{graham_concrete_1994}) What's wrong with the following statement? ``Since $n = \bigO{n}$ and $2n = \bigO{n}$ and so on, we have $\sum_{k=1}^n kn = \sum_{k=1}^n \bigO{n} = \bigO{n^2}$.''
+    
+    \item How much bigger of an input can a program with the following running times process in the same time, given a computer twice as fast?
+    
+    \noindent
+    \begin{enumerate*}
+        \item $\bigO{n}$
+        \item $\bigO{n^2}$
+        \item $\bigO{n^3}$
+        \item $\bigO{n^4}$
+        \item $\bigO{2^n}$
+    \end{enumerate*}
+
+    \item [\challenge] Jose has discovered an elegant way of counting the number of divisors using a modified version of the sieve of Eratosthenes.
+    
+    \begin{algorithm}[H]
+        \caption{Jose's divisor sieve}
+        \begin{algorithmic}[1]
+            \Function{DivisorSieve}{}
+            % \State initialize $\mathrm{divisors}$ as an array of length $n+1$ filled with $0$
+            \For{$i \gets 1$ to $n$}
+                \State $\mathrm{divisors}[i] \gets 0$
+            \EndFor
+            \For{$i \gets 1$ to $n$}
+                \For{$j \gets i$ to $n$ by $i$}
+                    \Comment{for each multiple of $i$ less than or equal to $n$}
+                    \State $\mathrm{divisors}[j] \gets \mathrm{divisors}[j] + 1$
+                \EndFor
+            \EndFor
+            \Return{divisors}
+            \EndFunction
+        \end{algorithmic}
+    \end{algorithm}
+    
+    He says, ``At first glance, it may seem that the time complexity is $\bigO{n^2}$ because of the nested for loop, but actually it runs in just $\bigO{n \log n}$ time!'' Prove or disprove his claim.
+    
+    \item [\challenge] Prove Theorem~\ref{thm:bigtheta}.
+    
+\end{enumerate}
+\end{exercises}

@@ -1,0 +1,383 @@
+\usepackage[a4paper,nomarginpar]{geometry}
+\usepackage{xcolor}
+\geometry{verbose,tmargin=1.5in,bmargin=1.5in,lmargin=1in,rmargin=1in}
+\definecolor{attyellow}{HTML}{72674C}
+\definecolor{attpurple}{HTML}{72476C}
+\definecolor{attteal}{HTML}{52676C}
+\definecolor{attred}{HTML}{72474C}
+\definecolor{attgreen}{HTML}{52674C}
+\definecolor{attblue}{HTML}{52476C}
+\definecolor{attgray}{HTML}{72676C}
+\usepackage[colorlinks=true,linkcolor=attpurple,citecolor=attgreen,urlcolor=attteal]{hyperref}
+\hypersetup{pdftitle={CSci 30/CS 110 Lecture Notes},
+ pdfauthor={Brian},
+ pdfsubject={CS 110}}
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+% \usepackage{textcomp}
+\usepackage[sfmath]{kpfonts}
+\usepackage{mathspec}
+\usepackage{fontspec}
+\usepackage{microtype}
+% \usepackage{unicode-math}
+\usepackage[inline]{enumitem}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{algorithm}
+% \usepackage{algcompatible}
+\usepackage[noend]{algpseudocode}
+\usepackage{minted}
+\usepackage{etoolbox}
+\usepackage{thmtools}
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage{pgfplots}
+\usepackage{titlesec}
+\usepackage{metalogo}
+
+% Supress microtype warnings
+\usepackage{silence}
+\WarningFilter{microtype}{Unknown slot number}
+
+% Colophon
+\usepackage[%
+% title={Design Information},
+titlestyle=scshape,
+titlesize=20pt, titlealign=c,
+parsize=10pt,
+parlead=12pt]{colophon}
+
+
+% \setsansfont[
+%     Path=./_fonts/,
+%     Extension=.otf,
+%     UprightFont=AvenirLTStd-Book,
+%     BoldFont=AvenirLTStd-Heavy,
+%     ItalicFont=AvenirLTStd-BookOblique,
+%     BoldItalicFont=AvenirLTStd-HeavyOblique,
+%     Scale=0.95
+% ]{Avenir}
+% \setmainfont[
+%     Path=./_fonts/,
+%     Extension=.otf,
+%     UprightFont=AvenirLTStd-Book,
+%     BoldFont=AvenirLTStd-Heavy,
+%     ItalicFont=AvenirLTStd-BookOblique,
+%     BoldItalicFont=AvenirLTStd-HeavyOblique,
+%     Scale=0.95
+% ]{Avenir}
+% \setmonofont[
+%     Path=./_fonts/,
+%     Extension=.otf,
+%     UprightFont=Inconsolata-LGC,
+%     BoldFont=Inconsolata-LGC-Bold,
+%     ItalicFont=Inconsolata-LGC-Italic,
+%     BoldItalicFont=Inconsolata-LGC-BoldItalic,
+%     Scale=0.9
+% ]{Inconsolata}
+
+% % IBM Plex fonts
+% \setsansfont[
+%     Path=./_fonts/,
+%     Extension=.otf,
+%     UprightFont=IBMPlexSans-Regular,
+%     BoldFont=IBMPlexSans-Bold,
+%     ItalicFont=IBMPlexSans-Italic,
+%     BoldItalicFont=IBMPlexSans-BoldItalic,
+%     Scale=0.95
+% ]{IBM Plex Sans}
+% \setmainfont[
+%     Path=./_fonts/,
+%     Extension=.otf,
+%     UprightFont=IBMPlexSans-Regular,
+%     BoldFont=IBMPlexSans-Bold,
+%     ItalicFont=IBMPlexSans-Italic,
+%     BoldItalicFont=IBMPlexSans-BoldItalic,
+%     Scale=0.9
+% ]{IBM Plex Sans}
+% \setmonofont[
+%     Path=./_fonts/,
+%     Extension=.otf,
+%     UprightFont=IBMPlexMono-Regular,
+%     BoldFont=IBMPlexMono-Bold,
+%     ItalicFont=IBMPlexMono-Italic,
+%     BoldItalicFont=IBMPlexMono-BoldItalic,
+%     Scale=0.9
+% ]{IBM Plex Mono}
+
+% Custom fonts!!!
+\setallsansfonts[
+    Path=./_fonts/,
+    Extension=.otf,
+    UprightFont=Whitney-Book-ProGkCy,
+    BoldFont=Whitney-Bold-ProGkCy,
+    ItalicFont=Whitney-BookItal-ProGkCy,
+    BoldItalicFont=Whitney-BoldItal-ProGkCy,
+    UprightFeatures={SmallCapsFont={WhitneyHTF-BookSC}},
+    BoldFeatures={SmallCapsFont={WhitneyHTF-BoldSC}},
+    ItalicFeatures={SmallCapsFont={WhitneyHTF-BookItalicSC}},
+    BoldItalicFeatures={SmallCapsFont={WhitneyHTF-BoldItalicSC}},
+    Numbers={OldStyle}
+]{Whitney}
+\setmainfont[
+    Path=./_fonts/,
+    Extension=.otf,
+    UprightFont=Whitney-Book-ProGkCy,
+    BoldFont=Whitney-Bold-ProGkCy,
+    ItalicFont=Whitney-BookItal-ProGkCy,
+    BoldItalicFont=Whitney-BoldItal-ProGkCy,
+    UprightFeatures={SmallCapsFont={WhitneyHTF-BookSC}},
+    BoldFeatures={SmallCapsFont={WhitneyHTF-BoldSC}},
+    ItalicFeatures={SmallCapsFont={WhitneyHTF-BookItalicSC}},
+    BoldItalicFeatures={SmallCapsFont={WhitneyHTF-BoldItalicSC}},
+    Numbers={OldStyle}
+]{Whitney}
+\setmathfont(Digits,Latin,Greek)[
+    Path=./_fonts/,
+    Extension=.otf,
+    UprightFont=Whitney-Book-ProGkCy,
+    BoldFont=Whitney-Bold-ProGkCy,
+    ItalicFont=Whitney-BookItal-ProGkCy,
+    BoldItalicFont=Whitney-BoldItal-ProGkCy,
+    UprightFeatures={SmallCapsFont={WhitneyHTF-BookSC}},
+    BoldFeatures={SmallCapsFont={WhitneyHTF-BoldSC}},
+    ItalicFeatures={SmallCapsFont={WhitneyHTF-BookItalicSC}},
+    BoldItalicFeatures={SmallCapsFont={WhitneyHTF-BoldItalicSC}},
+    Numbers={Lining, Tabular}
+]{Whitney}
+\setmathrm[
+    % version=normal,
+    Path=./_fonts/,
+    Extension=.otf,
+    UprightFont=Whitney-Book-ProGkCy,
+    BoldFont=Whitney-Bold-ProGkCy,
+    ItalicFont=Whitney-BookItal-ProGkCy,
+    BoldItalicFont=Whitney-BoldItal-ProGkCy,
+    UprightFeatures={SmallCapsFont={WhitneyHTF-BookSC}},
+    BoldFeatures={SmallCapsFont={WhitneyHTF-BoldSC}},
+    ItalicFeatures={SmallCapsFont={WhitneyHTF-BookItalicSC}},
+    BoldItalicFeatures={SmallCapsFont={WhitneyHTF-BoldItalicSC}},
+    Numbers={Lining, Proportional}
+]{Whitney}
+\setallmonofonts[
+    Path=./_fonts/,
+    Extension=.otf,
+    UprightFont={Operator Mono Book Regular},
+    BoldFont={Operator Mono Bold Regular},
+    ItalicFont={Operator Mono Book Italic},
+    BoldItalicFont={Operator Mono Bold Italic}
+]{Operator Mono}
+% \setallmonofonts[
+%     Path=./_fonts/,
+%     Extension=.otf,
+%     UprightFont=Inconsolata-LGC,
+%     BoldFont=Inconsolata-LGC-Bold,
+%     ItalicFont=Inconsolata-LGC-Italic,
+%     BoldItalicFont=Inconsolata-LGC-BoldItalic,
+%     Scale=0.9
+% ]{Inconsolata}
+\defaultfontfeatures{Ligatures=TeX}
+\newfontfamily\whitneylight[
+    Path=./_fonts/,
+    Extension=.otf,
+    UprightFont=Whitney-Light-ProGkCy,
+    BoldFont=Whitney-Semibld-ProGkCy,
+    ItalicFont=Whitney-LightItal-ProGkCy,
+    BoldItalicFont=Whitney-SemibldItal-ProGkCy,
+    UprightFeatures={SmallCapsFont={WhitneyHTF-LightSC}},
+    BoldFeatures={SmallCapsFont={WhitneyHTF-SemiBoldSC}},
+    ItalicFeatures={SmallCapsFont={WhitneyHTF-LightItalicSC}},
+    BoldItalicFeatures={SmallCapsFont={WhitneyHTF-SemiBoldItalicSC}},
+    Numbers={OldStyle}
+]{Whitney Light}
+\newfontfamily\whitneylightprop[
+    Path=./_fonts/,
+    Extension=.otf,
+    UprightFont=Whitney-Light-ProGkCy,
+    BoldFont=Whitney-Semibld-ProGkCy,
+    ItalicFont=Whitney-LightItal-ProGkCy,
+    BoldItalicFont=Whitney-SemibldItal-ProGkCy,
+    UprightFeatures={SmallCapsFont={WhitneyHTF-LightSC}},
+    BoldFeatures={SmallCapsFont={WhitneyHTF-SemiBoldSC}},
+    ItalicFeatures={SmallCapsFont={WhitneyHTF-LightItalicSC}},
+    BoldItalicFeatures={SmallCapsFont={WhitneyHTF-SemiBoldItalicSC}},
+    Numbers={Proportional}
+]{Whitney Light}
+
+% Index fonts
+\newfontfamily\indexwsqfont[
+    Path=./_fonts/,
+    Extension=.otf,
+    UprightFont=WhitneyIndWh-SqLig
+]{Whitney Index White Square Light}
+\newfontfamily\indexwsqtfont[
+    Path=./_fonts/,
+    Extension=.otf,
+    UprightFont=WhitneyIndWh-SqCnLight
+]{Whitney Index White Square Light 2}
+\newfontfamily\indexbrmfont[
+    Path=./_fonts/,
+    Extension=.otf,
+    UprightFont=WhitneyIndexBlack-RoundMd
+]{Whitney Index Black Round Medium}
+\newfontfamily\indexbsqfont[
+    Path=./_fonts/,
+    Extension=.otf,
+    UprightFont=WhitneyIndBl-SqLig
+]{Whitney Index Black Square Light}
+\newfontfamily\indexbsqtfont[
+    Path=./_fonts/,
+    Extension=.otf,
+    UprightFont=WhitneyIndBl-SqCnLight
+]{Whitney Index Black Square Light 2}
+
+% Handwritten font
+% \DeclareMathVersion{inkwell}
+\newfontfamily\inkwellsans[
+    Path=./_fonts/,
+    Extension=.otf,
+    UprightFont=InkwellSans-Book,
+    BoldFont=InkwellSans-Bold,
+    ItalicFont=InkwellSans-BookItalic,
+    BoldItalicFont=InkwellSans-BoldItalic,
+    Numbers={Proportional, Lining}
+]{Inkwell Sans}
+% \setmathfont(Digits,Latin,Greek)[
+%     % version=inkwell,
+%     Path=./_fonts/,
+%     Extension=.otf,
+%     UprightFont=InkwellSans-Book,
+%     BoldFont=InkwellSans-Bold,
+%     ItalicFont=InkwellSans-BookItalic,
+%     BoldItalicFont=InkwellSans-BoldItalic,
+%     Numbers={Proportional, Lining}
+% ]{Inkwell Sans}
+
+% Custom section heading styles
+\titleformat{\section}{\whitneylight\Large}{\whitneylightprop\thesection}{1em}{}
+\titleformat{\subsection}{\whitneylight\large}{\whitneylightprop\thesubsection}{1em}{}
+
+% Use index fonts for enumerate
+\makeatletter
+\newcommand{\ctext}[1]{\@ctext{#1}}
+\newcommand{\@ctext}[1]{\ifnumless{\number#1}{10}{{\indexwsqfont#1}}{{\indexwsqtfont#1}}}
+\makeatother
+\AddEnumerateCounter*{\ctext}{\@ctext}{10}
+
+\setlist[itemize]{label={$\vartriangleright$}}
+\renewcommand{\labelenumi}{\ctext{\theenumi}}
+\setlist[enumerate,2]{label=\Alph*, font=\indexwsqfont}
+
+\newcommand{\subject}[2]{\textsc{#1} #2}
+
+% Start with chapter 0
+\setcounter{chapter}{-1}
+\setlength{\parskip}{5pt}
+
+% Chapter heading
+\newcommand{\bsqnum}[1]{\ifnumless{\number#1}{10}{{\indexbsqfont#1}}{{\indexbsqtfont#1}}}
+\titleformat{\chapter}{\Huge\bfseries}{\raisebox{-4pt}{\fontsize{35pt}{35pt}\bsqnum{\thechapter}}}{12pt}{}
+\titlespacing*{\chapter}{0pt}{-50pt}{30pt}
+
+% Theorem envs
+\theoremstyle{definition}
+% \newtheorem{prob}{Problem}
+\mdfdefinestyle{mdbluebox}{%
+	roundcorner=7pt,
+	linewidth=1pt,
+	skipabove=12pt,
+	innertopmargin=10pt,
+	innerbottommargin=9pt,
+	skipbelow=2pt,
+	nobreak=true,
+	linecolor=attblue,
+	backgroundcolor=attblue!5,
+}
+\declaretheoremstyle[
+	headfont=\scshape\color{attblue},
+	mdframed={style=mdbluebox},
+	headpunct={\\[3pt]},
+	postheadspace={0pt}
+]{thmbluebox}
+\declaretheorem[style=thmbluebox,name=Theorem,numberwithin=chapter]{theorem}
+
+\declaretheorem[style=thmbluebox,name=Lemma,sibling=theorem]{lemma}
+\declaretheorem[style=thmbluebox,name=Proposition,sibling=theorem]{proposition}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{claim}[theorem]{Claim}
+
+\mdfdefinestyle{mdgreenbox}{%
+	linewidth=0.5pt,
+	skipabove=12pt,
+	frametitleaboveskip=5pt,
+	frametitlebelowskip=0pt,
+	skipbelow=2pt,
+	frametitlefont=\scshape,
+	innertopmargin=10pt,
+	innerbottommargin=8pt,
+	linecolor=attgreen,
+	backgroundcolor=attgreen!5,
+}
+\declaretheoremstyle[
+	headfont=\scshape\color{attgreen},
+	mdframed={style=mdgreenbox},
+	headpunct={\\[3pt]},
+	postheadspace={0pt},
+]{thmgreenbox}
+
+\declaretheorem[style=thmgreenbox,name=Example,sibling=theorem]{example}
+
+% Minted
+\setminted{xleftmargin=0pt}
+\usemintedstyle{bw}
+
+% Page headers and footers
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\textsc{\nouppercase{\leftmark}}}
+\fancyhead[RO]{\textsc{\nouppercase{\rightmark}}}
+\fancyfoot[CE,CO]{\thepage}
+\fancyfoot[LE,RO]{\color{attgray} \textsc{Draft} (\today)}
+\renewcommand{\headrulewidth}{0pt}
+
+% Pseudocode
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\renewcommand{\algorithmicfunction}{\textbf{algorithm}}
+\renewcommand{\Return}[1]{\State \textbf{return} #1}
+\algnewcommand\algorithmicforeach{\textbf{for each}}
+\algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
+\algrenewcommand{\algorithmiccomment}[1]{\hfill// #1}
+\newcommand{\algtrue}{\textsc{true}}
+\newcommand{\algfalse}{\textsc{false}}
+\newcommand{\algnull}{\textsc{null}}
+\MakeRobust{\Call}
+
+% Handwritten
+\newenvironment{handwritten}{\inkwellsans}{\par}
+
+% Add special icon for challenge items
+\newcommand{\challengeicon}{{\indexbrmfont *} }
+\newcommand{\challenge}{\refstepcounter{enumi}\challengeicon \ctext{\theenumi}}
+
+% Macros for big-O and friends (within math mode)
+\newcommand{\bigO}[1]{O\left(#1 \right)}
+\newcommand{\bigOmega}[1]{\Omega\left(#1 \right)}
+\newcommand{\bigTheta}[1]{\Theta\left(#1 \right)}
+\newcommand{\littleOmega}[1]{\omega\left(#1 \right)}
+\newcommand{\littleTheta}[1]{\theta\left(#1 \right)}
+
+% Macros
+\newcommand{\List}[1]{\left\{#1\right\}}
+
+% Exercises
+\newenvironment{exercises}{\setcounter{secnumdepth}{-1}%
+\section{Exercises}%
+Items marked with \challengeicon are ``challenge'' items. Let me know if you have answered any of them, so I can give you extra credit.}{\setcounter{secnumdepth}{2}}
+
+% CC license
+\usepackage{ccicons}

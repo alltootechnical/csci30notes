@@ -1,0 +1,412 @@
+\chapter{Recursion}
+\label{chap:recursion}
+
+Recursion is one of the fundamental concepts in computer science. In this chapter, you will see how recursion differs from iteration, how it manifests in some real-world problems, and some examples of algorithms that use recursion.
+
+If you want to learn more about recursion, you may read Chapter~\ref{chap:recursion}.
+
+\section{What is recursion?}
+We know different ways to express repetitive processes. In your first programming class, you have encountered the concept of loops. 
+
+\begin{definition}
+An object has a recursive behavior if it satisfies these properties:
+\begin{enumerate}
+    \item It has a terminating \textit{base case} that does not use recursion.
+    \item Whenever it calls itself, the problem gets simplified towards the base case.
+\end{enumerate}
+\end{definition}
+
+Basically, the main idea behind recursion is that 
+
+\section{Thinking recursively}
+
+
+\section{Recursive algorithms}
+
+\subsection{Recursive definitions}
+Why do we sometimes prefer recursion to iteration? One of the main reasons is that some methods and functions have a straightforward definition that uses recursion. This implies the implementation of these functions will be more elegant than their iterative counterparts.
+
+\begin{example}[Getting the $n$th factorial]
+The factorial has the following recursive definition:
+\[
+n! = \begin{cases}
+1 & \text{if } n=0 \\
+n\cdot\left(n-1\right)! & \text{otherwise}
+\end{cases}
+\]
+
+Implementing this would just involve directly copying the definition, so the pseudocode for getting the $n$th factorial is as follows.
+
+\begin{algorithm}[H]
+    \caption{A recursive algorithm to get the $n$th factorial}
+    \begin{algorithmic}[1]
+    \Require An integer $n$, where $n \ge 0$
+    \Ensure The value of $n!$
+    \Function{Factorial}{$n$}
+        \If{$n=0$}
+        \Return $1$
+        \Else
+        \Return $n \cdot \text{\Call{Factorial}{$n-1$}}$
+        \EndIf
+    \EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+Suppose we want to compute \Call{Factorial}{$5$}. Then this call will be evaluated by repeatedly applying the recursive definition, as illustrated below. 
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+    & \Call{Factorial}{5} \\
+    &\implies 5 \cdot \Call{Factorial}{4} \\
+    &\implies 5 \cdot \left( 4 \cdot \Call{Factorial}{3} \right) \\
+    &\implies 5 \cdot \left( 4 \cdot \left( 3 \cdot \Call{Factorial}{2} \right) \right) \\
+    &\implies 5 \cdot \left( 4 \cdot \left( 3 \cdot \left( 2 \cdot \Call{Factorial}{1} \right) \right) \right) \\
+    &\implies 5 \cdot \left( 4 \cdot \left( 3 \cdot \left( 2 \cdot \left( 1 \cdot \Call{Factorial}{0} \right) \right) \right) \right) \\
+    &\implies 5 \cdot \left( 4 \cdot \left( 3 \cdot \left( 2 \cdot \left( 1 \cdot 1 \right) \right) \right) \right) \\
+    &\implies 5 \cdot \left( 4 \cdot \left( 3 \cdot \left( 2 \cdot 1 \right) \right) \right) \\
+    &\implies 5 \cdot \left( 4 \cdot \left( 3 \cdot 2 \right) \right) \\
+    &\implies 5 \cdot \left( 4 \cdot 6 \right) \\
+    &\implies 5 \cdot 24 \\
+    &\implies 120
+    \end{align*}
+    \caption{Trace of the function call for \Call{Factorial}{$5$}}
+    % \label{fig:my_label}
+\end{figure}
+
+Thus \Call{Factorial}{$5$} returns $120$, as expected.
+\end{example}
+
+\subsection{Recursive structures}
+Another reason to prefer recursion to iteration is that some problems have a naturally recursive structure.
+
+\begin{example}[Searching for a file within a directory]
+How do you search for a file within a directory? You typically would use the search feature that's built-in. Now imagine that this feature did not exist at all. What would you do?
+
+
+
+\begin{algorithm}[H]
+    \caption{f}
+    \begin{algorithmic}[1]
+    \Require A directory $\textit{dir}$ and a $\textit{file}$
+    \Ensure \algtrue\ if file is found, \algfalse\ otherwise
+    \Function{FindFile}{\textit{dir}, \textit{file}}
+        \ForEach{file $f \in \text{\Call{ListFiles}{\textit{dir}}}$}
+            \If{$f = \mathit{file}$}
+            \Return \algtrue
+            \EndIf
+        \EndFor
+        \ForEach{$\textit{subdir} \in \text{\Call{ListDirectories}{\textit{dir}}}$}
+            \Return \Call{FindFile}{\textit{subdir}, \textit{file}}
+        \EndFor
+        \Return \algfalse
+    \EndFunction
+\end{algorithmic}
+\end{algorithm}
+\end{example}
+
+\section{Divide-and-conquer}
+One of the four algorithmic paradigms\footnote{So far, we have brute force (or complete search), and divide-and-conquer. In later chapters, we will encounter the other two algorithmic paradigms.} we will cover for this course is \textit{divide-and-conquer}. The divide-and-conquer paradigm involves three steps:
+\begin{enumerate*}
+    \item \textbf{divide} the original problem into several smaller instances of the problem (called \textit{subproblems}),
+    \item \textbf{conquer} these subproblems by solving each of them recursively, and then
+    \item \textbf{combine} the solutions to the subproblems into an overall solution to the original problem.
+\end{enumerate*}
+
+Applications of divide-and-conquer can be seen from many fields. 
+
+One of the prototypical example of a divide-and-conquer algorithm is \textit{merge sort}.
+
+\subsection{Exponentiation}
+The exponentiation operation is typically defined as a series of repeated multiplications, where to get the value of $x^n$, you would multiply the base $x$ by itself $n$ number of times.
+\[
+x^n = \underbrace{x \cdot x \cdot \cdots \cdot x}_{\text{$n$ times}}
+\]
+
+From this definition, we can implement a simple iterative algorithm that computes $x^n$.
+\begin{algorithm}[H]
+    \caption{An iterative algorithm for exponentiation}
+    \begin{algorithmic}[1]
+    \Require A real number $x$ and an integer $n$, where $n \ge 0$
+    \Ensure The value of $x^n$
+    \Function{Pow}{$x$, $n$}
+    \State $P \gets 1$
+    \For{$i \gets 1$ to $n$}
+        \State $P \gets P \cdot x$
+    \EndFor
+    \Return $P$
+    \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+
+It is not hard to see that \textsc{Pow} runs in $\bigO{n}$ time. For example, if we want to compute $x^8$ for some $x$, \Call{Pow}{$x$, $8$} would involve $8$ multiplications.
+
+But we can do better! Instead of considering the exponentiation operation as a series of repeated multiplications, we can also define exponentiation as a series of \textit{repeated squarings}. If we use the fact that
+\[
+    x^n = x^{n/2} \cdot x^{n/2} = \left(x^{n/2}\right)^2 = \left(x^2\right)^{n/2},
+\]
+then we can compute $x^8$ in just $3$ multiplications! We can do the following series of operations:
+\begin{align*}
+    x^8 &= x^4 \cdot x^4 \\
+    x^4 &= x^2 \cdot x^2 \\
+    x^2 &= x \cdot x
+\end{align*}
+What if the exponent $n$ is odd? We can use the property
+\[
+    x^n = x \cdot x^{n-1} = x \cdot \left(x^2\right)^{\frac{\left(n-1\right)}{2}}
+\]
+since we know that $n-1$ is even when $n$ is odd. Using these two properties, we can now define the exponentiation operation as a series of repeated squarings. We have:
+\[
+x^n = \begin{cases}
+    \left(x^2\right)^{n/2} & \text{if $n$ is even} \\
+    x \cdot \left(x^2\right)^{\frac{\left(n-1\right)}{2}} & \text{if $n$ is odd}
+\end{cases}
+\]
+
+Then the implementation would look like this:
+\begin{algorithm}[H]
+    \caption{A recursive algorithm for exponentiation by repeated squaring}
+    \begin{algorithmic}[1]
+    \Require A real number $x$ and an integer $n$, where $n \ge 0$
+    \Ensure The value of $x^n$
+    \Function{FastPow}{$x$, $n$}
+    \If{$n = 0$}
+        \Return $1$
+    \ElsIf{$n = 1$}
+        \Return $x$
+    \ElsIf{$n \bmod 2 = 0$}
+    \Comment{if $n$ is even}
+        \Return \Call{FastPow}{$x \cdot x$, $n/2$}
+    \ElsIf{$n \bmod 2 \ne 0$}
+    \Comment{if $n$ is odd}
+        \Return $x \cdot \text{\Call{FastPow}{$x \cdot x$, $\left(n-1\right)/2$}}$
+    \EndIf
+    \EndFunction 
+    \end{algorithmic}
+\end{algorithm}
+
+\subsection{Merge sort}
+Merge sort is a sorting algorithm that uses divide-and-conquer. It involves three steps:
+\begin{enumerate}
+    \item \textbf{Divide:} Split the array of length $n$ into two subarrays, each of length $n/2$.
+    \item \textbf{Conquer:} Sort the two subarrays using merge sort.
+    \item \textbf{Combine:} Merge the two subarrays together to form the sorted array.
+\end{enumerate}
+
+\begin{algorithm}[H]
+    \caption{The merging step in merge sort}
+    \begin{algorithmic}[1]
+        \Require Two sorted arrays $L$ and $R$
+        \Ensure A single sorted array $S$
+        \Function{Merge}{$L$, $R$}
+            \If{$L$ is empty}
+                \Return $R$
+            \ElsIf{$R$ is empty}
+                \Return $L$
+            \EndIf
+            \If{$\text{\Call{First}{$L$}} \le \text{\Call{First}{$R$}}$}
+                \Return \Call{Cons}{\Call{First}{$L$}, \Call{Merge}{\Call{Rest}{$L$}, $R$}}
+            \Else
+                \Return \Call{Cons}{\Call{First}{$R$}, \Call{Merge}{$L$, \Call{Rest}{$R$}}}
+            \EndIf
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \caption{The main merge sort algorithm}
+    \begin{algorithmic}[1]
+        \Require An array $A$
+        \Ensure A sorted array $S$
+        \Function{MergeSort}{$A$}
+            \If{$\text{\Call{Length}{$A$}} = 1$}
+            \Return $A$
+            \EndIf
+            \State split $A$ into two halves $L$ and $R$
+            \State $L \gets \text{\Call{MergeSort}{$L$}}$
+            \State $R \gets \text{\Call{MergeSort}{$R$}}$
+            \State $S \gets \text{\Call{Merge}{$L$, $R$}}$
+            \Return $S$
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{example}[Merge sort]
+f
+\end{example}
+
+\subsection{Analyzing divide-and-conquer algorithms}
+We can express the running time of divide-and-conquer algorithms using a \textit{recurrence}.
+
+Let $T\left(n\right)$ be the running time when input size is $n$. When the problem size is small enough (i.e., $n \le c$ for some constant $c$), then we can just use the straightforward solution that takes $\bigO{1}$ time. 
+
+Suppose that upon dividing the problem, it yielded $a$ subproblems, each of which is $1/b$ of the original. Solving one subproblem of size $n/b$ would have a running time of $T\left(n/b\right)$. To solve $a$ subproblems, it would take $a T\left(n/b\right)$ time.
+
+If it took $D\left(n\right)$ time to divide into subproblems, and $C\left(n\right)$ time to combine all solutions into the overall solution, we have the following recurrence:
+\[
+T\left(n\right) = \begin{cases}
+    \bigO{1} & \text{if $n \le c$}\\
+    a T\left(n/b\right) + D\left(n\right) + C\left(n\right) & \text{otherwise}
+\end{cases}
+\]
+
+Later in this chapter, we will see how we can solve some recurrences of this form.
+
+\begin{example}[Running time of merge sort]
+To simplify our analysis, assume that the problem size is a power of $2$. Then the divide step would yield two subproblems of exactly size $n/2$.
+
+When the size is exactly $1$, we can just use the straightforward solution that takes $\bigO{1}$ time.
+
+For $n > 1$, we can derive the running time as follows:
+\begin{enumerate}
+    \item \textbf{Divide:} The divide step splits the array into two equal subarrays. Getting the subarray takes $\bigO{n}$ at the worst case. Thus $D\left(n\right) = \bigO{n}$.
+    \item \textbf{Conquer:} We recursively solve two subproblems, each of size $n/2$, which contributes $2T(n/2)$ to the running time.
+    \item \textbf{Combine:} The merging step goes through every element of the two subarrays each of size $n/2$, so it takes $\bigO{n}$ time. Thus $C\left(n\right) = \bigO{n}$.
+\end{enumerate}
+
+Therefore, the worst-case running time of merge sort has the recurrence
+\[
+T\left(n\right) = \begin{cases}
+    \bigO{1} & \text{if $n = 1$}\\
+    2 T\left(n/2\right) + \bigO{n} & \text{otherwise}
+\end{cases}
+\]
+
+Solving this recurrence, we eventually get $T\left(n\right) = \bigO{n \log n}$. How?
+\end{example}
+
+\section{Solving recurrences}
+
+\subsection{Recursion trees}
+A recursion tree is a diagram of all the recursive calls made, and the amount of work done in each call. Each node in the recursion tree represents the cost of a single subproblem within a tree of recursive calls.
+
+\subsection{Master theorem}
+The master theorem serves as a ``cookbook'' for solving recurrences of the form
+\[
+T\left(n\right) = aT\left(n/b\right) + f\left(n\right)
+\]
+where $a \ge 1$ and $b>1$ are constants, and $f\left(n\right)$ is asymptotically positive.
+
+Here, $n/b$ may not be an integer, so we can safely ignore floors and ceilings.
+
+\begin{theorem}[Master theorem, from \cite{cormen_introduction_2009}]
+Let $a \ge 1$ and $b>1$ be constants, let $f\left(n\right)$ be a function, and let $T\left(n\right)$ be defined on the nonnegative integers by the recurrence
+\[
+    T\left(n\right) = a T\left(n/b\right) + f\left(n\right)
+\]
+Then $T\left(n\right)$ has the following asymptotic bounds:
+\begin{enumerate}
+    \item If $f\left(n\right) = \bigO{n^{\log_b a - \epsilon}}$ for some $\epsilon > 0$, then $T\left(n\right) = \bigTheta{n^{\log_b a}}$.
+    \item If $f\left(n\right) = \bigTheta{n^{\log_b a}}$, then $T\left(n\right) = \bigTheta{n^{\log_b a} \log n}$.
+    \item If $f\left(n\right) = \bigOmega{n^{\log_b a + \epsilon}}$ for some $\epsilon > 0$, then $T\left(n\right) = \bigTheta{f\left(n\right)}$.
+\end{enumerate}
+\end{theorem}
+
+There are three possible cases:
+\begin{enumerate}
+    \item The running time is \textbf{dominated by the cost of the leaves.}
+    
+    This happens when we have a huge number of subproblems, so most of the work is done at the bottom of the tree.
+    
+    \item The running time is \textbf{evenly distributed throughout the tree.}
+    
+    The branching just balances out the amount of work, so the same amount of work is done at every level.
+    
+    \item The running time is \textbf{dominated by the cost of the root.}
+    
+    The problem at the top of the tree does the most work, since the subproblems at its bottom are smaller.
+
+\end{enumerate}
+
+\begin{theorem}[Simplified master theorem]
+Suppose that $a \ge 1$, $b > 1$, and $d \ge 0$ are constants. Let $T\left(n\right)$ be the recurrence
+\[
+    T\left(n\right) = a T\left(n/b\right) + \bigO{n^d}
+\]
+Then
+\[
+    T\left(n\right) = \begin{cases}
+        \bigO{n^{\log_b a}} & \text{if $a > b^d$} \\
+        \bigO{n^d \log n} & \text{if $a = b^d$} \\
+        \bigO{n^d} & \text{if $a < b^d$}
+    \end{cases}
+\]
+\end{theorem}
+
+\subsection{Substitution method}
+The substitution method is another way of solving recurrences. It can solve more kinds of recurrences than simply using a recursion tree or applying the master theorem. It only involves two steps:
+\begin{enumerate}
+    \item Generate a guess for the correct answer, and
+    \item Prove the guess is correct using induction.
+\end{enumerate}
+
+How do you generate a guess? One of many ways of coming up with a guess is by repeatedly substituting the recurrence, in a process called \textit{unrolling the recursion}. This way, you could possibly find a pattern and generate your guess from there.
+
+\begin{example}[Using the substitution method]
+We have derived the following recurrence describing the worst-case running time of merge sort:
+\[
+T\left(n\right) = \begin{cases}
+    \bigO{1} & \text{if $n = 1$}\\
+    2 T\left(n/2\right) + \bigO{n} & \text{otherwise}
+\end{cases}
+\]
+
+We also have a guess that $T\left(n\right) = \bigO{n \log n}$ using the master theorem. We will now show that this is correct.
+
+\begin{proof}[Proof (by strong induction)]
+\textbf{Base case:} When $n=1$, then $T\left(n\right) = \bigO{1}$ by definition.
+
+\textbf{Hypothesis:} Assume $T\left(k\right) = \bigO{k \log k}$ \textbf{for all} $k < n$.
+
+\textbf{Inductive step:} We want to show that $T\left(n\right) \le cn\log n$ for some $c > 0$.
+\begin{align*}
+    T\left(n\right) &\le 2 T\left(n/2\right) + cn & \text{(since $cn = \bigO{n}$)}\\
+     &\le 2 c\left(n/2\right) \log\left(n/2\right) + cn \\
+     &= cn \log\left(n/2\right) + cn \\
+     &= cn \log n - cn + cn & \text{(since $\log\left(n/2\right) = \log n - \log 2 = \log n - 1$)}\\
+     &= cn \log n
+\end{align*}
+\end{proof}
+\end{example}
+
+\begin{exercises}
+\begin{enumerate}
+    \item 
+    \begin{enumerate}
+        \item Implement (using pseudocode) a recursive algorithm called \Call{Yarra}{$A$} that returns the elements of an array $A$ in reverse order.
+    
+        For example, suppose we have an array $\List{3,6,8,1,2,0,4}$. Then \Call{Yarra}{$\List{3,6,8,1,2,0,4}$} should return $\List{4,0,2,1,8,6,3}$.
+        
+        \item Trace the function calls when \Call{Yarra}{$\List{3,6,8,1,2,0,4}$} is evaluated.
+        
+        \item Prove that your \textsc{Yarra} algorithm is correct using induction.
+    \end{enumerate}
+    
+    \item We say that a string is a palindrome if it is the same forwards and backwards. An easy way is to check if the string and its reverse are the same.
+    
+    \begin{enumerate}
+        \item Implement (using pseudocode) a recursive algorithm called \Call{IsPalindrome}{$s$} that returns \algtrue{} if a string $s$ is a palindrome, otherwise it returns \algfalse{}. Assume that the input string $s$ only consists of lowercase English characters, with no spaces. 
+        
+        For example, \Call{IsPalindrome}{``racecar''} returns \algtrue{}, while \Call{IsPalindrome}{``recursion''} returns \algfalse{}.
+        
+        \item Prove that your \textsc{IsPalindrome} algorithm is correct using induction.
+    \end{enumerate}
+    
+    \item If we modify the merge sort algorithm such that it now divides an array into three smaller subarrays (instead of two), prove or disprove that the modified merge sort still runs in $\bigO{n \log n}$ time.
+
+    \item For each of the following recurrences, give an expression for the running time $T\left(n\right)$ if the recurrence can be solved with the master theorem. Otherwise, indicate that the master theorem does not apply.
+    \begin{enumerate}
+        \item $T\left(n\right) = 3T\left(n/2\right) + \bigO{n^2}$
+        \item $T\left(n\right) = 4T\left(n/2\right) + \bigO{n^2}$
+        \item $T\left(n\right) = 16T\left(n/4\right) + \bigO{n}$
+        \item $T\left(n\right) = 2T\left(n/4\right) + \bigO{n^{0.51}}$
+        \item $T\left(n\right) = 0.5T\left(n/2\right) + \bigO{1}$
+        \item $T\left(n\right) = \sqrt{2}T\left(n/2\right) + \bigO{n}$
+        \item $T\left(n\right) = 3T\left(n/2\right) + \bigO{\sqrt{n}}$
+        \item $T\left(n\right) = 7T\left(n/3\right) + \bigO{n^2}$
+        \item $T\left(n\right) = 5T\left(2n/3\right) + \bigO{n^4}$
+        \item $T\left(n\right) = 6T\left(5n/4\right) + \bigO{n^{1.5}}$
+    \end{enumerate}
+    
+    \item[\challenge] Show that the running time of the \textsc{Fib} algorithm (as shown earlier) is $\bigO{\phi^n}$, where $\phi = \frac{1+\sqrt{5}}{2} \approx 1.618$ is the golden ratio.
+\end{enumerate}
+\end{exercises}
