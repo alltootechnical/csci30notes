@@ -1,0 +1,22 @@
+# Font files
+_fonts/*.*
+
+# Output files
+*.pdf
+
+# Vim swap files
+*.sw*
+
+# LaTeX temp files
+*.aux
+*.log
+*.synctex*
+*.toc
+*.out
+*.bbl
+*.blg
+*.idx
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
