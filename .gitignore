@@ -1,6 +1,9 @@
 # Font files
 _fonts/*.*
 
+# Minted temp files
+_minted-main/*
+
 # Output files
 *.pdf
 
