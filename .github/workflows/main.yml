@@ -14,8 +14,8 @@ jobs:
       uses: xu-cheng/latex-action@master
       with:
         root_file: main.tex
-        extra_system_packages: "alpine-sdk py-pygments"
-        compiler: make
+        extra_system_packages: "py-pygments"
+        args: "-xelatex -file-line-error -interaction=nonstopmode -shell-escape"
     - name: Check pdf files
       run: |
         set -e
@@ -23,6 +23,6 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@master
       with:
-        name: main.pdf
+        name: csci30notes.pdf
         path: main.pdf
       if: always()
