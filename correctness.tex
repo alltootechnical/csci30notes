@@ -55,11 +55,35 @@ Recall that there is a neat formula to get the sum of integers from $1$ to $n$, 
 \sum_{i=1}^{n} i = \frac{n\left(n+1\right)}{2}
 \]
 
-How are we sure that this formula gives the correct answer for all positive integers $n$?
+How are we sure that this formula gives the correct answer for all positive integers $n$? We can do a proof by induction by following these steps:
+\begin{enumerate}
+    \item Base case: Show that the statement is true for the simplest...
+    \item Inductive hypothesis: Assume that the statement is true for some $k$.
+    \item Inductive step: Show that the statement is true for $k+1$, which uses the inductive hypothesis.
+\end{enumerate}
 
 \begin{claim}
 The above formula gives the correct answer for integers $n>0$.
 \end{claim}
+\begin{proof}
+    When $n=1$, the sum of integers from $1$ to $1$ is just $1$, and substituting $n$ with $1$ in the formula, we get $\frac{1\left(1+1\right)}{2} = \frac{1\cdot 2}{2} = 1$. Thus the formula is correct for $n=1$.
+
+    Assume that the sum of integers from $1$ to $k$ is $\frac{k\left(k+1\right)}{2}$, for some integer $k < n$. We now show that the formula also holds for $n = k+1$.
+
+    For the inductive step, we want to show that
+\[
+    \sum_{i=1}^{k+1} i = \frac{\left(k+1\right) \left(k+2\right)}{2}
+\]
+holds. Then
+    \begin{align*}
+        \sum_{i=1}^{k+1} i &= 1 + 2 + \cdots + k + \left(k+1\right) \\
+        &= \sum_{i=1}^{k} i + \left(k+1\right) \\
+        &= \frac{k\left(k+1\right)}{2} + \left(k+1\right) & \text{(by the inductive hypothesis)} \\
+        &= \frac{\left(k^2 + k\right) + \left(2k + 2\right)}{2} \\
+        &= \frac{k^2 + 3k + 2}{2} \\
+        &= \frac{\left(k+1\right) \left(k+2\right)}{2}
+    \end{align*}
+\end{proof}
 
 \section{Loop invariants}
 How do loops work anyway? Recall that a loop consists of a condition, and a series of statements. These statements are always executed, so long as the loop condition holds true. Once the loop condition does not hold anymore, the loop terminates without executing the statements.
@@ -71,11 +95,44 @@ A loop invariant is a statement that remains true before, during, and after ever
 \begin{enumerate}
     \item Initialization: A loop invariant is true at the start of the loop.
     \item Maintenance: If a loop invariant is true before the $i$th iteration, it should also remain true before the $\left(i+1\right)$th iteration.
-    \item Termination: A loop invariant is true after the loop ends, which helps us show that the algorithm is correct.
+    \item Termination: A loop invariant remains true after the loop ends, which helps us show that the algorithm is correct.
 \end{enumerate}
 \end{definition}
 
 How do we find a loop invariant? One way is to consider what happens in each iteration of the loop. Try looking at how the value of the variables change throughout an iteration.
+
+\begin{example}
+    example box
+\end{example}
+
+Another way is to consider what output we should expect the algorithm to return. Most likely, the variable whose value will be returned at the end of the loop is being changed at every iteration.
+
+\begin{example}
+    Suppose we have an algorithm for getting the product of integers from $1$ to $n$.
+    \begin{algorithm}[H]
+        \caption{Get the product of integers from $1$ to $n$ }
+        \begin{algorithmic}[1]
+            \Require An integer $n$, where $n>0$ 
+            \Ensure The product of integers from $1$ to $n$ 
+            \Function{IntProd}{$n$}
+            \State $P \gets 1$
+            \For{$i \gets 1$ to  $n$ }
+            \State $P \gets P \cdot i$ 
+            \EndFor
+            \Return $P$
+            \EndFunction
+        \end{algorithmic}
+    \end{algorithm}
+
+    Notice that inside the for loop, the value of $P$ is updated. For each iteration, what does the value of $P$ represent? 
+\end{example}
+
+We can also consider how the algorithm ``builds up'' the answer. This is somewhat related to the previous method of considering what the algorithm is expected to output. Try looking at how it builds up a partial solution at every iteration, so at the end of the loop the answer would now correspond for the entire solution.
+
+\begin{handwritten}
+    this is handwritten!
+\end{handwritten}
+
 \begin{exercises}
 
 [to-do]
