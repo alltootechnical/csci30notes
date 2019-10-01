@@ -14,7 +14,7 @@ jobs:
       uses: xu-cheng/latex-action@master
       with:
         root_file: main.tex
-        extra_system_packages: "build-essential py-pygments"
+        extra_system_packages: "alpine-sdk py-pygments"
         compiler: make
     - name: Check pdf files
       run: |
@@ -23,6 +23,6 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@master
       with:
-        name: csci30notes.pdf
+        name: main.pdf
         path: main.pdf
       if: always()
