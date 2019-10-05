@@ -2,9 +2,15 @@
 \CatchFileDef{\headfull}{.git/HEAD}{}
 \StrGobbleRight{\headfull}{1}[\head]
 \StrBehind[2]{\head}{/}[\branch]
+\IfSubStr{\head}{ref:}{%
 \CatchFileDef{\commit}{.git/refs/heads/\branch}{}
 \typeout{Git head: \headfull}
-\typeout{Git commit: \commit}
+\typeout{Git commit: \commit}}{%
+\typeout{HEAD is detached}
+\newcommand{\commit}{\headfull}
+\newcommand{\branch}{master}
+}
+
 
 \vspace*{\fill}
 \begin{center}
