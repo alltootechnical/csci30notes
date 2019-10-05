@@ -3,6 +3,8 @@
 \StrGobbleRight{\headfull}{1}[\head]
 \StrBehind[2]{\head}{/}[\branch]
 \CatchFileDef{\commit}{.git/refs/heads/\branch}{}
+\typeout{Git head: \headfull}
+\typeout{Git commit: \commit}
 
 \vspace*{\fill}
 \begin{center}
