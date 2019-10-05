@@ -9,7 +9,6 @@ You will need the following:
  - The fonts folder (you can get it [here](http://penoy.admu.edu.ph/~guadalupe154884/files/_fonts.zip))
 
 Then compile the document by running `make`.
-*(TO-DO: Set up CI for this repo)*
 
 
 ## Planned outline
