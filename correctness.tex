@@ -85,6 +85,52 @@ holds. Then
     \end{align*}
 \end{proof}
 
+We can use induction to prove the correctness of recursive algorithms.
+
+\begin{example}[Proving correctness using induction, from \cite{skiena_algorithm_2008}]
+    Suppose we want to prove that the following recursive algorithm for incrementing an integer is correct:
+    \begin{algorithm}[H]
+        \caption{Increment an integer}
+        \begin{algorithmic}[1]
+            \Function{Increment}{$y$}
+                \If{$y=0$}
+                    \Return $1$
+                \Else
+                    \If{$y \bmod 2 \ne 0$}
+                    \Comment{if $y$ is odd}
+                    \Return $2\cdot \text{\Call{Increment}{$\lfloor y/2\rfloor$}}$
+                    \Else
+                        \Return $y+1$
+                    \EndIf
+                \EndIf
+            \EndFunction
+        \end{algorithmic}
+    \end{algorithm}
+
+    \begin{proof}
+        The base case here is when $y=0$. Obviously, $0+1=1$ and the algorithm returns $1$ as expected. So the algorithm is correct for the base case.
+
+        Assume that the algorithm returns the correct answer when $y = n-1$. This is our inductive hypothesis. Now, we need to show that the algorithm also returns the correct answer when $y = n$.
+
+        Recall that we have two cases. First, let us do the inductive step for the case when $y$ is even. We can see that the algorithm explicitly returns $y+1$, which is what we expect.
+
+        For the case when $y$ is odd, it relies on getting the value of \Call{Increment}{$\lfloor \frac{y}{2}\rfloor$}, which we want to assume is correct by our inductive hypothesis. But there's a slight problem. We only assume that the algorithm is correct for $y = n-1$, but not for $y = n/2$.
+
+        We can fix this by making our inductive hypothesis stronger. Instead of just assuming correctness for a single value (like $n-1$), we can assume correctness for all possible values less than $n-1$. So we now assume that the algorithm returns the correct answer for all $y \le n-1$.
+
+        With this stronger inductive hypothesis, we can now prove for the case when $y$ is odd. Since $y = 2k+1$ for some integer $k$, then we have the following:
+        \begin{align*}
+            2 \cdot \text{\Call{Increment}{$\lfloor (2k+1)/2\rfloor$}} &= 2 \cdot \text{\Call{Increment}{$\lfloor k+ 1/2\rfloor$}} \\
+            &= 2 \cdot \text{\Call{Increment}{$k$}} \\
+            &= 2 \cdot (k+1) \\
+            &= 2k + 2 \\
+            &= y+1
+        \end{align*}
+
+        Since we have shown that the algorithm returns the correct answer for both even and odd values of $y$, then we can conclude that the algorithm is correct.
+    \end{proof}
+\end{example}
+
 \section{Loop invariants}
 How do loops work anyway? Recall that a loop consists of a condition, and a series of statements. These statements are always executed, so long as the loop condition holds true. Once the loop condition does not hold anymore, the loop terminates without executing the statements.
 
@@ -99,15 +145,54 @@ A loop invariant is a statement that remains true before, during, and after ever
 \end{enumerate}
 \end{definition}
 
+If we have successfully shown that the loop invariant for an algorithm satisfies those properties, we can use the fact that the loop invariant still holds true upon termination of the loop in order to show that the algorithm is correct.
+
 How do we find a loop invariant? One way is to consider what happens in each iteration of the loop. Try looking at how the value of the variables change throughout an iteration.
 
-\begin{example}
-    example box
+\begin{example}[Finding a loop invariant]
+    Consider an algorithm that uses binary search to find some element $e$ within a sorted array $A$, given that $e$ is an element in the array. Once found, it will return the target element's index within $A$.
+
+    \begin{algorithm}[H]
+        \caption{Get the index of an element in a sorted array}
+        \begin{algorithmic}[1]
+            \Require A sorted array $A$ of $n$ elements and the target element $e$
+            \Ensure The index of $e$ in the array
+            \Function{SearchElement}{$A$, $e$}
+                \State $L \gets 1$
+                \State $R \gets n$
+                \While{$L \le R$}
+                    \State $M \gets \lfloor\frac{L+R}{2}\rfloor$
+                    \If{$A[M] = e$}
+                        \Return $M$
+                    \ElsIf{$A[M] > e$}
+                        \State $R \gets M-1$
+                    \Else
+                        \State $L \gets M+1$
+                    \EndIf
+                \EndWhile
+            \EndFunction
+        \end{algorithmic}
+    \end{algorithm}
+
+    At first glance, we can see that the variables $L$, $R$, and $M$ are updated in each iteration. But we are not yet sure how these variables get updated, so let us simulate what happens in the algorithm with a sample input.
+    Suppose we have a sorted array $A$ with elements $\List{-5, 10, 14, 33, 42, 42, 42}$, and we want to find the index of the element $14$ within the array.
+
+    At the start of the first iteration, we have $L = 1$ and $R = 7$ (since there are $n=7$ elements in the given array). As we go through the first iteration, the value of $M$ gets updated to $\lfloor\frac{1+7}{2}\rfloor = 4$. Then we compare the value of $A[4]$ (which is $33$) and the target element $e = 14$. Since $A[4]>14$, we update the value of $R$ to $4-1 = 3$.
+
+    At the start of the second iteration, we have $L = 1$ and $R = 3$. The value of $M$ gets updated to $\lfloor\frac{1+3}{2}\rfloor = 2$. Since $A[2] = 10$ is less than $14$, we update the value of $L$ to $2+1 = 3$.
+
+    At the start of the third iteration, we have $L=3$ and $R=3$. The value of $M$ gets updated to $\lfloor\frac{3+3}{2}\rfloor = 3$. Since $A[3] = 14$ is equal to the target element $14$, then the algorithm returns $3$, the index of $14$, and the algorithm terminates.
+
+    What have you noticed? It's easy to observe that the value of $L$ increases or the value of $R$ decreases in every iteration. We could call this a loop invariant, but it would not help us in proving the correctness of the algorithm.
+
+    Maybe we're on to something when we mentioned about the changes in $L$ and $R$. You can also observe that $L$ and $R$ tend to converge towards a single value, which would be the index of the element. This implies that $L$ and $R$ enclose the location of the target element, which is always true at the start of every iteration. This is our loop invariant!
+
+    In other words, the loop invariant for this algorithm states that at the start of each iteration in the while loop, the subarray $\List{A[L], \ldots, A[R]}$ contains the target element $e$.
 \end{example}
 
 Another way is to consider what output we should expect the algorithm to return. Most likely, the variable whose value will be returned at the end of the loop is being changed at every iteration.
 
-\begin{example}
+\begin{example}[Finding a loop invariant]
     Suppose we have an algorithm for getting the product of integers from $1$ to $n$.
     \begin{algorithm}[H]
         \caption{Get the product of integers from $1$ to $n$ }
@@ -116,7 +201,7 @@ Another way is to consider what output we should expect the algorithm to return.
             \Ensure The product of integers from $1$ to $n$ 
             \Function{IntProd}{$n$}
             \State $P \gets 1$
-            \For{$i \gets 1$ to  $n$ }
+            \For{$i \gets 1$ to  $n$}
             \State $P \gets P \cdot i$ 
             \EndFor
             \Return $P$
@@ -125,11 +210,153 @@ Another way is to consider what output we should expect the algorithm to return.
     \end{algorithm}
 
     Notice that inside the for loop, the value of $P$ is updated. For each iteration, what does the value of $P$ represent? 
+
+    At the start of the first iteration, the value of $P$ is $1$. Then at the start of the second iteration, the value of $P$ is now $1$, since we have reassigned $P$ with the value of $P$ at that time, multiplied with the previous value of $i$ which is $1$. 
+
+    Then at the start of the third iteration, the value of $P$ is now $2$. In fact, we can generalize this further for any given iteration. We can say that at the start of the $i$th iteration, the value of $P$ is $1 \cdot 1 \cdot 2 \cdot \cdots \cdot (i-1)$. Notice that this statement holds true at the start of every iteration of the for loop. We now have a loop invariant for this algorithm.
+
+    In simpler terms, the loop invariant states that at the start of the $i$th iteration, the value of $P$ contains the product of integers from $1$ to $i-1$.
 \end{example}
 
 We can also consider how the algorithm ``builds up'' the answer. This is somewhat related to the previous method of considering what the algorithm is expected to output. Try looking at how it builds up a partial solution at every iteration, so at the end of the loop the answer would now correspond for the entire solution.
 
-\begin{exercises}
+\begin{example}[Finding a loop invariant]
+    This is an algorithm that merge sort uses in its merging step.
+    \begin{algorithm}[H]
+        \caption{Merge two sorted arrays together}
+        \begin{algorithmic}[1]
+            \Require Two sorted arrays $L$ and $R$
+            \Ensure A single sorted array $S$
+            \Function{Merge}{$L$, $R$}
+                \State $p \gets \text{\Call{Length}{$L$}}$
+                \State $q \gets \text{\Call{Length}{$R$}}$
+                \State $n \gets p + q$
+                \State $S \gets \text{empty array of size $n$}$
+                \State $i \gets 1$
+                \Comment{pointer for $L$}
+                \State $j \gets 1$
+                \Comment{pointer for $R$}
+                \State $L[p+1] \gets \infty$
+                \State $R[q+1] \gets \infty$
+                \For{$k \gets 1$ to $n$}
+                    \If{$L[i] \le R[j]$}
+                        \State $S[k] \gets L[i]$
+                        \State $i \gets i+1$
+                    \Else
+                        \State $S[k] \gets R[j]$
+                        \State $j \gets j+1$
+                    \EndIf
+                \EndFor
+                \Return $S$
+            \EndFunction
+        \end{algorithmic}
+    \end{algorithm}
 
-[to-do]
+    Inside the for loop, the variables $i$ and $j$ are modified, as well as the array $S$. %It often helps if you try simulating what happens in the algorithm by using a sample input. For example, suppose we have two sorted arrays $L$ with elements $\List{1,4}$, and $R$ with elements $\List{2,3,5}$.
+
+    Notice that the goal of the for loop is to assign a value for each position in the new array $S$, that's why the loop runs from $1$ to $n$, which corresponds to the length of $S$. 
+
+    The variables $i$ and $j$ are pointers for $L$ and $R$, respectively. They both refer to the index of the smallest element in the respective arrays that is not in array $S$ yet. How can we be sure about this? If $L[i]$, for example, gets added to $S$, then $i$ would get incremented, so it would now point to the next smallest element in $L$ and for sure that element isn't on $S$ yet. We can also say the same thing about $R[j]$ and its pointer $j$.
+
+    % At the start of the first iteration, what can we say about $S$? It's still empty because at this point, we haven't yet modified the array after the initialization. 
+\end{example}
+
+\begin{exercises}
+    \begin{enumerate}
+        \item Prove the following statements using induction.
+            \begin{enumerate}
+                \item $\displaystyle\sum_{i=1}^n i^2 = \frac{n\left(n+1\right)\left(2n+1\right)}{6}$
+                \item $\displaystyle\sum_{i=1}^n i^3 = \frac{n^2 \left(n+1\right)^2}{4}$
+                \item $1 + 2 + 4 + \cdots + 2^{n-1} = 2^n - 1$
+                \item $n < 2^n$ for any positive integer $n$
+                \item $\left(n+1\right)^n < n^{n+1}$ for any integer $n \ge 3$
+            \end{enumerate}
+
+        \item There is an efficient method to evaluate a polynomial $p\left(x\right)$ for some value of $x$, called the Horner's method. Given a polynomial
+            \[
+                p\left(x\right) = a_0 + a_1 x + a_2 x^2 + a_3 x^3 + \cdots + a_n x^n
+            \]
+        we can rewrite this in terms of only additions and multiplications, such that
+        \[
+            p\left(x\right) = a_0 + x\cdot\left(a_1 + x\cdot\left(a_2 + \cdots + x\cdot\left(a_{n-1} + x\cdot a_n\right)\right)\right)
+        \]
+        Here's an algorithm that evaluates a given polynomial at some value of $x$ using the Horner's method. The polynomial is represented as a (zero-based) array of coefficients, where $P[i] = a_i$.
+        \begin{algorithm}[H]
+            \caption{Evaluate a polynomial at a specified value}
+            \begin{algorithmic}[1]
+                \Require An array of coefficients $P$, where $P = \List{a_0, a_1, a_2, \ldots, a_n}$
+                \Ensure The value of the polynomial at $x$
+                \Function{PolyEval}{$P$, $x$}
+                    \State $y \gets P[n]$
+                    \For{$i \gets n-1$ downto $0$}
+                        \State $y \gets P[i] + x\cdot y$
+                    \EndFor
+                    \Return $y$
+                \EndFunction
+            \end{algorithmic}
+        \end{algorithm}
+
+        \begin{enumerate}
+            \item State the loop invariant in the algorithm.
+            \item Show that your chosen loop invariant satisfies the initialization, maintenance, and termination properties.
+        \end{enumerate}
+
+    \item[\challenge] The greatest common divisor (gcd) of two integers is the largest integer that divides them both. For example, the gcd of $6$ and $15$ is $3$, since $3$ divides both $6$ and $15$.
+
+        One of the oldest algorithms still in common use is the Euclidean algorithm (named after Euclid), which is an efficient algorithm to calculate the gcd of two integers. 
+
+        \begin{algorithm}[H]
+            \caption{Calculate the gcd of two numbers}
+            \begin{algorithmic}[1]
+                \Require Two positive integers $a$ and $b$
+                \Ensure The value of $\gcd\left(a, b\right)$
+                \Function{Euclid}{$a$, $b$}
+                    \State $x \gets a$
+                    \State $y \gets b$
+                    \While{$y \ne 0$}
+                        \State $r \gets x \bmod y$
+                        \Comment{the remainder when $x$ is divided by $y$}
+                        \State $x \gets y$
+                        \State $y \gets r$
+                    \EndWhile
+                    \Return $x$
+                \EndFunction
+            \end{algorithmic}
+        \end{algorithm}
+
+        \begin{enumerate}
+            \item State the loop invariant in the algorithm.
+            \item Show that your chosen loop invariant satisfies the initialization, maintenance, and termination properties.
+        \end{enumerate}
+
+        \item[\challenge] Consider this recursive implementation of the merge algorithm.
+        \begin{algorithm}[H]
+            \caption{Merge two sorted arrays together}
+            \begin{algorithmic}[1]
+                \Require Two sorted arrays $L$ and $R$
+                \Ensure A single sorted array $S$
+                \Function{Merge}{$L$, $R$}
+                    \If{$L$ is empty}
+                        \Return $R$
+                    \ElsIf{$R$ is empty}
+                        \Return $L$
+                    \EndIf
+                    \If{$\text{\Call{First}{$L$}} \le \text{\Call{First}{$R$}}$}
+                        \Return \Call{Cons}{\Call{First}{$L$}, \Call{Merge}{\Call{Rest}{$L$}, $R$}}
+                    \Else
+                        \Return \Call{Cons}{\Call{First}{$R$}, \Call{Merge}{$L$, \Call{Rest}{$R$}}}
+                    \EndIf
+                \EndFunction
+            \end{algorithmic}
+        \end{algorithm}
+
+        Using induction, prove that the \textsc{Merge} algorithm returns the correct answer, using the following steps:
+        \begin{enumerate}
+            \item Identify the base cases and show that the algorithm returns the correct answer for those cases.
+            \item State the inductive hypothesis for the algorithm.
+            \item Show that the algorithm also returns the correct answer for the recursive case using your inductive hypothesis.
+        \end{enumerate}
+
+    \item f
+    \end{enumerate}
 \end{exercises}
