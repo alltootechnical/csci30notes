@@ -1,4 +1,9 @@
 \thispagestyle{empty}
+\CatchFileDef{\headfull}{.git/HEAD}{}
+\StrGobbleRight{\headfull}{1}[\head]
+\StrBehind[2]{\head}{/}[\branch]
+\CatchFileDef{\commit}{.git/refs/heads/\branch}{}
+
 \vspace*{\fill}
 \begin{center}
 \begin{minipage}{0.5\textwidth}
@@ -7,6 +12,9 @@
 \textonehalf th edition
 
 Last updated: \today
+
+\vspace{0.5cm}
+This revision: \href{https://github.com/alltootechnical/csci30notes/commit/\commit}{\texttt{\commit}} on branch \href{https://github.com/alltootechnical/csci30notes/tree/\branch}{\texttt{\branch}}.
 \vspace{1cm}
 
 \copyright{} Copyright 2019 \href{http://penoy.admu.edu.ph/~guadalupe154884/}{Brian Guadalupe}
