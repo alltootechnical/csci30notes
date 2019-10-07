@@ -310,7 +310,51 @@ The maintenance property is like the inductive step in a proof by induction. You
     \end{proof}
 \end{example}
 
+There may be cases when an algorithm involves multiple loops. For nested loops, we work inside-out by establishing a loop invariant for the inner loop and show that it satisfies the termination property. Then we use that loop invariant to formulate another loop invariant for the outer loop and also show that it satisfies the termination property.
 
+\begin{example}[Finding loop invariants in nested loops]
+    The Cartesian product is an operation where given two sets $A$ and $B$, returns the product $A \times B$ which is the set of all ordered pairs $\left(a, b\right)$ where $a \in A$ and $b \in B$. In set-builder notation,
+    \[
+        A \times B = \List{\left(a,b\right) \mid a \in A \text{ and } b \in B}.
+    \]
+    For example, if $A = \List{1,3}$ and $B = \List{2,4,6}$, then 
+    \[
+        A \times B = \List{(1,2),(1,4),(1,6),(3,2),(3,4),(3,6)}.
+    \]
+    The following iterative algorithm gets the Cartesian product of two arrays $A$ and $B$.
+    \begin{algorithm}[H]
+        \caption{Get the Cartesian product of two arrays}
+        \begin{algorithmic}[1]
+            \Require Two arrays $A$ (of size $n$) and $B$ (of size $m$)
+            \Ensure The Cartesian product $A \times B$
+            \Function{CartesianProd}{$A$, $B$}
+                \State $P \gets \text{empty array}$
+                \For{$i \gets 1$ to $n$}
+                    \For{$j \gets 1$ to $m$}
+                        \State \Call{Append}{$P$, $\left(A[i], B[j]\right)$}
+                        \Comment{$\left(A[i], B[j]\right)$ is an ordered pair}
+                    \EndFor
+                \EndFor
+                \Return $P$
+           \EndFunction
+       \end{algorithmic}
+   \end{algorithm}
+
+   We have two for loops that are nested, so we need to find a loop invariant for each. 
+
+   Let us first establish a loop invariant for the inner loop (lines 4--5). Since the inner loop iterates through each element of $B$, then we can say the elements of the Cartesian product $\List{A[i]} \times \List{B[1],\ldots,B[j-1]}$ have been added to $P$ at the start of each iteration.
+
+   To establish a loop invariant for the outer loop (lines 3--5), we can use the termination property of the loop invariant for the inner loop. Recall that when the inner loop terminates, the invariant states that the elements of the Cartesian product $\List{A[i]} \times B$ have been added to $P$. So at the start of each iteration in the outer loop, we can say that $P$ contains the elements of $\List{A[1],\ldots,A[i-1]} \times B$.
+
+   Then by the end of the outer loop, $P$ contains the elements of $A \times B$, which is what we want the algorithm to return.
+
+   We have found the two loop invariants in the algorithm, which are as follows:
+   \begin{itemize}
+       \item Inner loop: At the start of each iteration $j$, the elements of the Cartesian product $\List{A[i]} \times \List{B[1],\ldots,B[j-1]}$ have been added to $P$.
+
+       \item Outer loop: At the start of each iteration $i$, $P$ contains the elements of the Cartesian product $\List{A[1],\ldots,A[i-1]} \times B$.
+   \end{itemize}
+\end{example}
 
 \begin{exercises}
     \begin{enumerate}
@@ -439,8 +483,9 @@ The maintenance property is like the inductive step in a proof by induction. You
                     \State $C \gets \text{empty array of size $m \times p$}$
                     \For{$i \gets 1$ to $m$}
                         \For{$j \gets 1$ to $p$}
+                            \State $C[i][j] \gets 0$
                             \For{$k \gets 1$ to $n$}
-                                \State $C[i][j] \gets C[i][j] + A[i][k]\cdot B[j][k]$
+                                \State $C[i][j] \gets C[i][j] + A[i][k]\cdot B[k][j]$
                             \EndFor
                         \EndFor
                     \EndFor
@@ -451,7 +496,7 @@ The maintenance property is like the inductive step in a proof by induction. You
 
         \begin{enumerate}
             \item State the loop invariants in the algorithm.
-            \item Show that your chosen loop invariant satisfies the initialization, maintenance, and termination properties.
+            \item Show that your chosen loop invariants each satisfy the initialization, maintenance, and termination properties.
         \end{enumerate}
 
     \item[\challenge] Prove that the \textsc{Merge} algorithm is correct by showing that its loop invariant(as established earlier) satisfies the initialization, maintenance, and termination properties.
