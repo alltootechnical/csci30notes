@@ -158,8 +158,8 @@ How do we find a loop invariant? One way is to consider what output we should ex
             \Ensure The product of integers from $1$ to $n$ 
             \Function{IntProd}{$n$}
             \State $P \gets 1$
-            \For{$i \gets 1$ to  $n$}
-            \State $P \gets P \cdot i$ 
+            \For{$k \gets 2$ to  $n$}
+            \State $P \gets P \cdot k$ 
             \EndFor
             \Return $P$
             \EndFunction
@@ -168,11 +168,11 @@ How do we find a loop invariant? One way is to consider what output we should ex
 
     Notice that inside the for loop, the value of $P$ is updated. For each iteration, what does the value of $P$ represent? 
 
-    At the start of the first iteration, the value of $P$ is $1$. Then at the start of the second iteration, the value of $P$ is now $1$, since we have reassigned $P$ with the value of $P$ at that time, multiplied with the previous value of $i$ which is $1$. 
+    At the start of the first iteration, the value of $P$ is $1$. Then at the start of the second iteration, the value of $P$ is now $2$, since we have reassigned $P$ with the value of $P$ at that time, multiplied with the previous value of $k$ which is $2$. 
 
-    Then at the start of the third iteration, the value of $P$ is now $2$. In fact, we can generalize this further for any given iteration. We can say that at the start of the $i$th iteration, the value of $P$ is $1 \cdot 1 \cdot 2 \cdot \cdots \cdot (i-1)$. Notice that this statement holds true at the start of every iteration of the for loop. We now have a loop invariant for this algorithm.
+    Then at the start of the third iteration, the value of $P$ is now $6$. In fact, we can generalize this further for any given iteration. We can say that at the start of the $i$th iteration, the value of $P$ is $1 \cdot 2 \cdot \cdots \cdot \left(k-1\right)$. Notice that this statement holds true at the start of every iteration of the for loop. We now have a loop invariant for this algorithm.
 
-    In simpler terms, the loop invariant states that at the start of the $i$th iteration, the value of $P$ contains the product of integers from $1$ to $i-1$.
+    In simpler terms, the loop invariant states that at the start of the $i$th iteration, the value of $P$ contains the product of integers from $1$ to $k-1$.
 \end{example}
 
 Another way is to consider what happens in each iteration of the loop. Try looking at how the value of the variables change throughout an iteration.
@@ -269,6 +269,24 @@ If we want to show that our loop invariant is true at the end of the loop, then 
 
 The maintenance property is like the inductive step in a proof by induction. You assume that the loop invariant holds true at the start of some iteration. Then you need to show that it still holds true at the start of the next iteration.
 
+\begin{example}[Proving the correctness of \textsc{IntProd}]
+    Our loop invariant for the \textsc{IntProd} algorithm states that at the start of the $i$th iteration, the value of $P$ contains the product of integers from $1$ to $k-1$.
+
+    \begin{proof}
+        We show that our chosen loop invariant satisfies the initialization, maintenance, and termination properties.
+
+    \begin{enumerate}
+        \item Initialization: At the start of the first iteration, we have $k=2$. By the loop invariant, the value of $P$ contains the product of integers from $1$ to $2-1=1$ which is just $1$, and this is what $P$ has been set to.
+
+        \item Maintenance: Assume that at the start of some iteration, the loop invariant holds true, so we have $k = j$ for some $j$. By the loop invariant, the value of $P$ contains the product of integers from $1$ to $j-1$. Then we multiply $P$ by $j$, so the value of $P$ is now the product of integers from $1$ to $j$. Thus the loop invariant still holds true for the next iteration where $k= j+1$.
+
+        \item Termination: At the end of the for loop, we have $k = n+1$. By the loop invariant, the value of $P$ contains the product of integers from $1$ to $n$. This is what the algorithm should return, and which it then returns.
+    \end{enumerate}
+
+    Therefore, the \textsc{IntProd} algorithm is correct.
+    \end{proof}
+\end{example}
+
 \begin{example}[Proving the correctness of \textsc{SearchElement}]
     Our loop invariant of the \textsc{SearchElement} algorithm states that at the start of each iteration in the while loop, the subarray $\List{A[L],\ldots,A[R]}$ contains the target element $e$.
 
@@ -277,7 +295,7 @@ The maintenance property is like the inductive step in a proof by induction. You
 
         \begin{enumerate}
             \item Initialization: At the start of the first iteration, we have $L=1$ and $R=n$. By the loop invariant, the subarray $\List{A[1],\ldots,A[n]}$ contains $e$, which is obviously true since the subarray is essentially the whole array itself and $e$ is an element of the array.
-            \item Maintenance: Assume that at the start of some iteration, we have $L=\ell$ and $R = r$. By the loop invariant, the subarray $\List{A[\ell],\ldots,A[r]}$ contains $e$, so we can also say that $A[\ell] \le e$ and $e \le A[r]$. The value of $M$ gets updated to $\lfloor\frac{\ell+r}{2}\rfloor$. This implies that $A[\ell] \le A[M] \le A[r]$. 
+            \item Maintenance: Assume that at the start of some iteration, the loop invariant holds true, so we have $L=\ell$ and $R = r$. By the loop invariant, the subarray $\List{A[\ell],\ldots,A[r]}$ contains $e$, so we can also say that $A[\ell] \le e$ and $e \le A[r]$. The value of $M$ gets updated to $\lfloor\frac{\ell+r}{2}\rfloor$. This implies that $A[\ell] \le A[M] \le A[r]$. 
                 
                 There are two possible cases, either $A[M] > e$ or $A[M] < e$. If $A[M] > e$, then we know that the target element is smaller than the middle element of the subarray, so the value of $R$ gets updated to $M-1$. Since $A[\ell] \le e$ and $A[M-1] \le A[M]$, then the condition $A[\ell] \le e \le A[M-1]$ holds true. Thus the subarray $\List{A[\ell],\ldots,A[M-1]}$ contains $e$, so the loop invariant is preserved for the start of the next iteration.
 
@@ -292,6 +310,8 @@ The maintenance property is like the inductive step in a proof by induction. You
     \end{proof}
 \end{example}
 
+
+
 \begin{exercises}
     \begin{enumerate}
         \item Prove the following statements using induction.
@@ -303,7 +323,32 @@ The maintenance property is like the inductive step in a proof by induction. You
                 \item $\left(n+1\right)^n < n^{n+1}$ for any integer $n \ge 3$
             \end{enumerate}
 
-        \item While debugging a legacy app created in the early 2000s, Luis has come across this mysterious algorithm that was left undocumented (as was the standard procedure at that time) involving a for loop.
+
+        \item Luis has designed an in-place\footnote{We say that an algorithm is \textit{in-place} if it does not consume any additional space. We will encounter this term again when we talk about sorting algorithms.} algorithm to reverse an array.
+            \begin{algorithm}[H]
+                \caption{Reverse an array}
+                \begin{algorithmic}[1]
+                    \Require An array $A$ of $n$ elements
+                    \Ensure The array in reverse
+                    \Function{Yarra}{$A$}
+                        \State $i \gets \lfloor\frac{n-1}{2}\rfloor$
+                        \State $j \gets \lfloor\frac{n}{2}\rfloor$
+                        \While{$i \ge 1$ and $j \le n$}
+                            \State \Call{Swap}{$A[i]$, $A[j]$}
+                            \State $i \gets i-1$
+                            \State $j \gets j+1$
+                        \EndWhile
+                        \Return $A$
+                    \EndFunction
+                \end{algorithmic}
+           \end{algorithm}
+
+        \begin{enumerate}
+            \item State the loop invariant in the algorithm.
+            \item Show that your chosen loop invariant satisfies the initialization, maintenance, and termination properties.
+        \end{enumerate}
+
+        \item While debugging a legacy app created in the early 2000s, you have come across this mysterious algorithm that was left undocumented (as was the standard procedure at that time) involving a for loop.
             \begin{algorithm}[H]
                 \caption{A mysterious algorithm that does... something}
                 \begin{algorithmic}[1]
@@ -335,7 +380,7 @@ The maintenance property is like the inductive step in a proof by induction. You
         \[
             p\left(x\right) = a_0 + x\cdot\left(a_1 + x\cdot\left(a_2 + \cdots + x\cdot\left(a_{n-1} + x\cdot a_n\right)\right)\right)
         \]
-        Here's an algorithm that evaluates a given polynomial at some value of $x$ using the Horner's method. The polynomial is represented as a (zero-indexed) array of coefficients, where $P[i] = a_i$.
+        Here's an algorithm that evaluates a given polynomial at some value of $x$ using the Horner's method. The polynomial is represented as a (zero-indexed) array of $n+1$ coefficients, where $P[i] = a_i$.
         \begin{algorithm}[H]
             \caption{Evaluate a polynomial at a specified value}
             \begin{algorithmic}[1]
@@ -384,6 +429,55 @@ The maintenance property is like the inductive step in a proof by induction. You
             \item Show that your chosen loop invariant satisfies the initialization, maintenance, and termination properties.
         \end{enumerate}
 
+    \item[\challenge] Here is a straightforward algorithm to multiply two matrices $A$ (of size $m \times n$) and $B$ (of size $n \times p$).
+        \begin{algorithm}[H]
+            \caption{Multiply two matrices}
+            \begin{algorithmic}[1]
+                \Require Two matrices $A$ (of size $m \times n$) and $B$ (of size $n \times p$)
+                \Ensure A matrix of size $m \times p$
+                \Function{MatrixMultiply}{$A$, $B$}
+                    \State $C \gets \text{empty array of size $m \times p$}$
+                    \For{$i \gets 1$ to $m$}
+                        \For{$j \gets 1$ to $p$}
+                            \For{$k \gets 1$ to $n$}
+                                \State $C[i][j] \gets C[i][j] + A[i][k]\cdot B[j][k]$
+                            \EndFor
+                        \EndFor
+                    \EndFor
+                    \Return $C$
+                \EndFunction
+            \end{algorithmic}
+        \end{algorithm}
+
+        \begin{enumerate}
+            \item State the loop invariants in the algorithm.
+            \item Show that your chosen loop invariant satisfies the initialization, maintenance, and termination properties.
+        \end{enumerate}
+
+    \item[\challenge] Prove that the \textsc{Merge} algorithm is correct by showing that its loop invariant(as established earlier) satisfies the initialization, maintenance, and termination properties.
+
+    \item Here is a recursive algorithm to get the $n$th even number, where $0$ is the first even number.
+    \begin{algorithm}[H]
+        \caption{Get the $n$th even number}
+        \begin{algorithmic}[1]
+            \Require An integer $n$, where $n>0$
+            \Ensure The $n$th even number
+            \Function{Even}{$n$}
+                \If{$n=1$}
+                    \Return $0$
+                \Else
+                    \Return $\text{\Call{Even}{$n-1$}} + 2$
+                \EndIf
+            \EndFunction
+        \end{algorithmic}
+    \end{algorithm}
+        Using induction, prove that the \textsc{Even} algorithm returns the correct answer, using the following steps:
+        \begin{enumerate}
+            \item Identify the base cases and show that the algorithm returns the correct answer for those cases.
+            \item State the inductive hypothesis for the algorithm.
+            \item Show that the algorithm also returns the correct answer for the recursive case using your inductive hypothesis.
+        \end{enumerate}
+
         \item[\challenge] Consider this recursive implementation of the merge algorithm.
         \begin{algorithm}[H]
             \caption{Merge two sorted arrays together}
@@ -412,6 +506,5 @@ The maintenance property is like the inductive step in a proof by induction. You
             \item Show that the algorithm also returns the correct answer for the recursive case using your inductive hypothesis.
         \end{enumerate}
 
-    \item f
     \end{enumerate}
 \end{exercises}
