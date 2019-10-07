@@ -140,14 +140,42 @@ If for each iteration, everything inside the loop gets executed, then there must
 A loop invariant is a statement that remains true before, during, and after every iteration of the loop. It satisfies these properties:
 \begin{enumerate}
     \item Initialization: A loop invariant is true at the start of the loop.
-    \item Maintenance: If a loop invariant is true before the $i$th iteration, it should also remain true before the $\left(i+1\right)$th iteration.
+    \item Maintenance: If a loop invariant is true at the start of the current iteration, then it should also remain true at the start of the next iteration.
     \item Termination: A loop invariant remains true after the loop ends, which helps us show that the algorithm is correct.
 \end{enumerate}
 \end{definition}
 
 If we have successfully shown that the loop invariant for an algorithm satisfies those properties, we can use the fact that the loop invariant still holds true upon termination of the loop in order to show that the algorithm is correct.
 
-How do we find a loop invariant? One way is to consider what happens in each iteration of the loop. Try looking at how the value of the variables change throughout an iteration.
+How do we find a loop invariant? One way is to consider what output we should expect the algorithm to return. Most likely, the variable whose value will be returned at the end of the loop is being changed at every iteration.
+
+\begin{example}[Finding a loop invariant]
+    Suppose we have an algorithm for getting the product of integers from $1$ to $n$.
+    \begin{algorithm}[H]
+        \caption{Get the product of integers from $1$ to $n$ }
+        \begin{algorithmic}[1]
+            \Require An integer $n$, where $n>0$ 
+            \Ensure The product of integers from $1$ to $n$ 
+            \Function{IntProd}{$n$}
+            \State $P \gets 1$
+            \For{$i \gets 1$ to  $n$}
+            \State $P \gets P \cdot i$ 
+            \EndFor
+            \Return $P$
+            \EndFunction
+        \end{algorithmic}
+    \end{algorithm}
+
+    Notice that inside the for loop, the value of $P$ is updated. For each iteration, what does the value of $P$ represent? 
+
+    At the start of the first iteration, the value of $P$ is $1$. Then at the start of the second iteration, the value of $P$ is now $1$, since we have reassigned $P$ with the value of $P$ at that time, multiplied with the previous value of $i$ which is $1$. 
+
+    Then at the start of the third iteration, the value of $P$ is now $2$. In fact, we can generalize this further for any given iteration. We can say that at the start of the $i$th iteration, the value of $P$ is $1 \cdot 1 \cdot 2 \cdot \cdots \cdot (i-1)$. Notice that this statement holds true at the start of every iteration of the for loop. We now have a loop invariant for this algorithm.
+
+    In simpler terms, the loop invariant states that at the start of the $i$th iteration, the value of $P$ contains the product of integers from $1$ to $i-1$.
+\end{example}
+
+Another way is to consider what happens in each iteration of the loop. Try looking at how the value of the variables change throughout an iteration.
 
 \begin{example}[Finding a loop invariant]
     Consider an algorithm that uses binary search to find some element $e$ within a sorted array $A$, given that $e$ is an element in the array. Once found, it will return the target element's index within $A$.
@@ -188,34 +216,6 @@ How do we find a loop invariant? One way is to consider what happens in each ite
     Maybe we're on to something when we mentioned about the changes in $L$ and $R$. You can also observe that $L$ and $R$ tend to converge towards a single value, which would be the index of the element. This implies that $L$ and $R$ enclose the location of the target element, which is always true at the start of every iteration. This is our loop invariant!
 
     In other words, the loop invariant for this algorithm states that at the start of each iteration in the while loop, the subarray $\List{A[L], \ldots, A[R]}$ contains the target element $e$.
-\end{example}
-
-Another way is to consider what output we should expect the algorithm to return. Most likely, the variable whose value will be returned at the end of the loop is being changed at every iteration.
-
-\begin{example}[Finding a loop invariant]
-    Suppose we have an algorithm for getting the product of integers from $1$ to $n$.
-    \begin{algorithm}[H]
-        \caption{Get the product of integers from $1$ to $n$ }
-        \begin{algorithmic}[1]
-            \Require An integer $n$, where $n>0$ 
-            \Ensure The product of integers from $1$ to $n$ 
-            \Function{IntProd}{$n$}
-            \State $P \gets 1$
-            \For{$i \gets 1$ to  $n$}
-            \State $P \gets P \cdot i$ 
-            \EndFor
-            \Return $P$
-            \EndFunction
-        \end{algorithmic}
-    \end{algorithm}
-
-    Notice that inside the for loop, the value of $P$ is updated. For each iteration, what does the value of $P$ represent? 
-
-    At the start of the first iteration, the value of $P$ is $1$. Then at the start of the second iteration, the value of $P$ is now $1$, since we have reassigned $P$ with the value of $P$ at that time, multiplied with the previous value of $i$ which is $1$. 
-
-    Then at the start of the third iteration, the value of $P$ is now $2$. In fact, we can generalize this further for any given iteration. We can say that at the start of the $i$th iteration, the value of $P$ is $1 \cdot 1 \cdot 2 \cdot \cdots \cdot (i-1)$. Notice that this statement holds true at the start of every iteration of the for loop. We now have a loop invariant for this algorithm.
-
-    In simpler terms, the loop invariant states that at the start of the $i$th iteration, the value of $P$ contains the product of integers from $1$ to $i-1$.
 \end{example}
 
 We can also consider how the algorithm ``builds up'' the answer. This is somewhat related to the previous method of considering what the algorithm is expected to output. Try looking at how it builds up a partial solution at every iteration, so at the end of the loop the answer would now correspond for the entire solution.
@@ -261,6 +261,37 @@ We can also consider how the algorithm ``builds up'' the answer. This is somewha
     % At the start of the first iteration, what can we say about $S$? It's still empty because at this point, we haven't yet modified the array after the initialization. 
 \end{example}
 
+Now that you have established a loop invariant, the difficult part is done. Now we need to show that our chosen loop invariant satisfies the initialization, maintenance, and termination properties. You may notice that by showing that those properties are satisfied, the resulting proof of correctness will resemble a proof by induction!
+
+The termination property says that the loop invariant remains true after the loop ends. In other words, we conclude that after the last iteration of the loop, the algorithm returns the expected output, so it must be correct. You may imply from the name itself that the termination property must show that the loop (and thus the algorithm) terminates. It is obvious that a for loop always terminates, but you can't say the same for while loops. Somehow you must prove that the loop terminates, otherwise the proof won't work. But proving that the loop indeed terminates is already implied when we analyze the running time of the algorithm.
+
+If we want to show that our loop invariant is true at the end of the loop, then we need to show that it is also true at the start of the loop. The initialization property says that the loop invariant is true at the start of the loop. You could think of this as showing that the algorithm is correct for the base case.
+
+The maintenance property is like the inductive step in a proof by induction. You assume that the loop invariant holds true at the start of some iteration. Then you need to show that it still holds true at the start of the next iteration.
+
+\begin{example}[Proving the correctness of \textsc{SearchElement}]
+    Our loop invariant of the \textsc{SearchElement} algorithm states that at the start of each iteration in the while loop, the subarray $\List{A[L],\ldots,A[R]}$ contains the target element $e$.
+
+    \begin{proof}
+        We show that our chosen loop invariant satisfies the initialization, maintenance, and termination properties.
+
+        \begin{enumerate}
+            \item Initialization: At the start of the first iteration, we have $L=1$ and $R=n$. By the loop invariant, the subarray $\List{A[1],\ldots,A[n]}$ contains $e$, which is obviously true since the subarray is essentially the whole array itself and $e$ is an element of the array.
+            \item Maintenance: Assume that at the start of some iteration, we have $L=\ell$ and $R = r$. By the loop invariant, the subarray $\List{A[\ell],\ldots,A[r]}$ contains $e$, so we can also say that $A[\ell] \le e$ and $e \le A[r]$. The value of $M$ gets updated to $\lfloor\frac{\ell+r}{2}\rfloor$. This implies that $A[\ell] \le A[M] \le A[r]$. 
+                
+                There are two possible cases, either $A[M] > e$ or $A[M] < e$. If $A[M] > e$, then we know that the target element is smaller than the middle element of the subarray, so the value of $R$ gets updated to $M-1$. Since $A[\ell] \le e$ and $A[M-1] \le A[M]$, then the condition $A[\ell] \le e \le A[M-1]$ holds true. Thus the subarray $\List{A[\ell],\ldots,A[M-1]}$ contains $e$, so the loop invariant is preserved for the start of the next iteration.
+
+                If $A[M] < e$, then we know that the target element is larger than the middle element of the subarray, so the value of $L$ gets updated to $M-1$. Since $e \le A[r]$ and $A[M] \le A[M+1]$, the condition $A[M+1] \le e \le A[r]$ holds true. Thus the subarray $\List{A[M+1],\ldots,A[r]}$ contains $e$, so the loop invariant is still preserved for the start of the next iteration.
+
+            \item Termination: Notice that the while loop terminates when it returns a value, which happens when $A[M]$ is equal to the target element $e$. 
+
+                At the end of the last iteration, we have $L = R = k$ for some index $k$. Then the value of $M$ was updated to $\lfloor\frac{2k}{2}\rfloor = k$. By the loop invariant, the subarray $\List{A[k],\ldots,A[k]}$ contains $e$. But the subarray is just a single element containing $A[k]$, so this must be the target element itself, since $A[k] = e = A[k]$. Thus the algorithm returns $k$, the index of the target element, which is what we expect the algorithm to return.
+        \end{enumerate}
+
+        Therefore, the \textsc{SearchElement} algorithm is correct.
+    \end{proof}
+\end{example}
+
 \begin{exercises}
     \begin{enumerate}
         \item Prove the following statements using induction.
@@ -272,6 +303,30 @@ We can also consider how the algorithm ``builds up'' the answer. This is somewha
                 \item $\left(n+1\right)^n < n^{n+1}$ for any integer $n \ge 3$
             \end{enumerate}
 
+        \item While debugging a legacy app created in the early 2000s, Luis has come across this mysterious algorithm that was left undocumented (as was the standard procedure at that time) involving a for loop.
+            \begin{algorithm}[H]
+                \caption{A mysterious algorithm that does... something}
+                \begin{algorithmic}[1]
+                    \Require Two arrays $A$ and $B$
+                    \Ensure An array
+                    \Function{Mystery}{$A$, $B$}
+                        \State $C \gets \text{empty array}$
+                        \ForEach{element $a$ in $A$}
+                            \If{$a$ in $B$}
+                                \State \Call{Append}{$C$, $a$}
+                            \EndIf
+                        \EndFor
+                        \Return $C$
+                    \EndFunction
+                \end{algorithmic}
+            \end{algorithm}
+            
+        \begin{enumerate}
+            \item What does the \textsc{Mystery} algorithm output?
+            \item State the loop invariant in the algorithm.
+            \item Show that your chosen loop invariant satisfies the initialization, maintenance, and termination properties.
+        \end{enumerate}
+                        
         \item There is an efficient method to evaluate a polynomial $p\left(x\right)$ for some value of $x$, called the Horner's method. Given a polynomial
             \[
                 p\left(x\right) = a_0 + a_1 x + a_2 x^2 + a_3 x^3 + \cdots + a_n x^n
@@ -280,7 +335,7 @@ We can also consider how the algorithm ``builds up'' the answer. This is somewha
         \[
             p\left(x\right) = a_0 + x\cdot\left(a_1 + x\cdot\left(a_2 + \cdots + x\cdot\left(a_{n-1} + x\cdot a_n\right)\right)\right)
         \]
-        Here's an algorithm that evaluates a given polynomial at some value of $x$ using the Horner's method. The polynomial is represented as a (zero-based) array of coefficients, where $P[i] = a_i$.
+        Here's an algorithm that evaluates a given polynomial at some value of $x$ using the Horner's method. The polynomial is represented as a (zero-indexed) array of coefficients, where $P[i] = a_i$.
         \begin{algorithm}[H]
             \caption{Evaluate a polynomial at a specified value}
             \begin{algorithmic}[1]
@@ -303,7 +358,7 @@ We can also consider how the algorithm ``builds up'' the answer. This is somewha
 
     \item[\challenge] The greatest common divisor (gcd) of two integers is the largest integer that divides them both. For example, the gcd of $6$ and $15$ is $3$, since $3$ divides both $6$ and $15$.
 
-        One of the oldest algorithms still in common use is the Euclidean algorithm (named after Euclid), which is an efficient algorithm to calculate the gcd of two integers. 
+        An efficient algorithm to calculate the gcd of two integers is the Euclidean algorithm (named after Euclid), which is one of the oldest algorithms still in common use today! 
 
         \begin{algorithm}[H]
             \caption{Calculate the gcd of two numbers}
