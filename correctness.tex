@@ -48,16 +48,17 @@ When designing algorithms, we want to ensure that every possible inputs are all 
 By ensuring that an algorithm is provably correct, we avoid unexpected or undefined behavior. Thus, we ensure that an algorithm \textit{expectedly} returns the correct output.
 
 \section{Mathematical induction}
-One technique to prove the correctness of an algorithm is through a proof by induction. This is commonly used when an algorithm only involves a closed-form expression.
+One technique to prove the correctness of an algorithm is through a proof by induction. %This is commonly used when an algorithm only involves a closed-form expression.
+You can think of mathematical induction like climbing an infinitely high ladder. We obviously know that we can reach the first rung of the ladder, which is just near the base. If we can reach some rung of the ladder, then we can also reach the next rung. From these two statements, what can we conclude? We can then conclude that we can reach \textit{any} rung of the ladder.
 
-Recall that there is a neat formula to get the sum of integers from $1$ to $n$, which is as follows:
+We often prove by induction when an algorithm only involves a closed-form expression. Recall that there is a neat formula to get the sum of integers from $1$ to $n$, which is as follows:
 \[
 \sum_{i=1}^{n} i = \frac{n\left(n+1\right)}{2}
 \]
 
 How are we sure that this formula gives the correct answer for all positive integers $n$? We can do a proof by induction by following these steps:
 \begin{enumerate}
-    \item Base case: Show that the statement is true for the simplest...
+    \item Base case: Show that the statement is true for all trivial inputs.
     \item Inductive hypothesis: Assume that the statement is true for some $k$.
     \item Inductive step: Show that the statement is true for $k+1$, which uses the inductive hypothesis.
 \end{enumerate}
@@ -83,9 +84,11 @@ holds. Then
         &= \frac{k^2 + 3k + 2}{2} \\
         &= \frac{\left(k+1\right) \left(k+2\right)}{2}
     \end{align*}
+
+    Since we have shown that the formula gives the correct answer for $n = k+1$, therefore it is correct for $n>0$.
 \end{proof}
 
-We can use induction to prove the correctness of recursive algorithms.
+We also use induction to prove the correctness of recursive algorithms.
 
 \begin{example}[Proving correctness using induction, from \cite{skiena_algorithm_2008}]
     Suppose we want to prove that the following recursive algorithm for incrementing an integer is correct:
@@ -114,7 +117,7 @@ We can use induction to prove the correctness of recursive algorithms.
 
         Recall that we have two cases. First, let us do the inductive step for the case when $y$ is even. We can see that the algorithm explicitly returns $y+1$, which is what we expect.
 
-        For the case when $y$ is odd, it relies on getting the value of \Call{Increment}{$\lfloor \frac{y}{2}\rfloor$}, which we want to assume is correct by our inductive hypothesis. But there's a slight problem. We only assume that the algorithm is correct for $y = n-1$, but not for $y = n/2$.
+        For the case when $y$ is odd, it relies on getting the value of \Call{Increment}{$\lfloor y/2 \rfloor$}, which we want to assume is correct by our inductive hypothesis. But there's a slight problem. We only assume that the algorithm is correct for $y = n-1$, but not for $y = n/2$.
 
         We can fix this by making our inductive hypothesis stronger. Instead of just assuming correctness for a single value (like $n-1$), we can assume correctness for all possible values less than $n-1$. So we now assume that the algorithm returns the correct answer for all $y \le n-1$.
 
@@ -130,6 +133,8 @@ We can use induction to prove the correctness of recursive algorithms.
         Since we have shown that the algorithm returns the correct answer for both even and odd values of $y$, then we can conclude that the algorithm is correct.
     \end{proof}
 \end{example}
+
+As a rule of thumb, if the recursive case reduces the size of the problem by $1$, then it suffices to use ordinary induction. If the recursive case reduces the size of the problem by more than $1$ (e.g., by half the size), then it becomes necessary to use strong induction.
 
 \section{Loop invariants}
 How do loops work anyway? Recall that a loop consists of a condition, and a series of statements. These statements are always executed, so long as the loop condition holds true. Once the loop condition does not hold anymore, the loop terminates without executing the statements.
@@ -259,6 +264,8 @@ We can also consider how the algorithm ``builds up'' the answer. This is somewha
     The variables $i$ and $j$ are pointers for $L$ and $R$, respectively. They both refer to the index of the smallest element in the respective arrays that is not in array $S$ yet. How can we be sure about this? If $L[i]$, for example, gets added to $S$, then $i$ would get incremented, so it would now point to the next smallest element in $L$ and for sure that element isn't on $S$ yet. We can also say the same thing about $R[j]$ and its pointer $j$.
 
     % At the start of the first iteration, what can we say about $S$? It's still empty because at this point, we haven't yet modified the array after the initialization. 
+
+    The loop invariant states that at the start of each iteration $k$, the non-empty part of $S$ contains the $k-1$ smallest elements of $L$ and $R$ in sorted order.
 \end{example}
 
 Now that you have established a loop invariant, the difficult part is done. Now we need to show that our chosen loop invariant satisfies the initialization, maintenance, and termination properties. You may notice that by showing that those properties are satisfied, the resulting proof of correctness will resemble a proof by induction!
@@ -313,7 +320,7 @@ The maintenance property is like the inductive step in a proof by induction. You
 There may be cases when an algorithm involves multiple loops. For nested loops, we work inside-out by establishing a loop invariant for the inner loop and show that it satisfies the termination property. Then we use that loop invariant to formulate another loop invariant for the outer loop and also show that it satisfies the termination property.
 
 \begin{example}[Finding loop invariants in nested loops]
-    The Cartesian product is an operation where given two sets $A$ and $B$, returns the product $A \times B$ which is the set of all ordered pairs $\left(a, b\right)$ where $a \in A$ and $b \in B$. In set-builder notation,
+    The Cartesian product\footnote{If you're familiar with SQL, you can get the Cartesian product by doing a cross join from two tables.} is an operation where given two sets $A$ and $B$, returns the product $A \times B$ which is the set of all ordered pairs $\left(a, b\right)$ where $a \in A$ and $b \in B$. In set-builder notation,
     \[
         A \times B = \List{\left(a,b\right) \mid a \in A \text{ and } b \in B}.
     \]
@@ -327,12 +334,15 @@ There may be cases when an algorithm involves multiple loops. For nested loops, 
         \begin{algorithmic}[1]
             \Require Two arrays $A$ (of size $n$) and $B$ (of size $m$)
             \Ensure The Cartesian product $A \times B$
-            \Function{CartesianProd}{$A$, $B$}
-                \State $P \gets \text{empty array}$
+            \Function{CrossJoin}{$A$, $B$}
+                \State $P \gets \text{empty array of size $nm$}$
+                \State $k \gets 1$
                 \For{$i \gets 1$ to $n$}
                     \For{$j \gets 1$ to $m$}
-                        \State \Call{Append}{$P$, $\left(A[i], B[j]\right)$}
-                        \Comment{$\left(A[i], B[j]\right)$ is an ordered pair}
+                        % \State \Call{Append}{$P$, $\left(A[i], B[j]\right)$}
+                        % \Comment{$\left(A[i], B[j]\right)$ is an ordered pair}
+                        \State $C[k] \gets \left(A[i], B[j]\right)$
+                        \State $k \gets k+1$
                     \EndFor
                 \EndFor
                 \Return $P$
@@ -342,9 +352,9 @@ There may be cases when an algorithm involves multiple loops. For nested loops, 
 
    We have two for loops that are nested, so we need to find a loop invariant for each. 
 
-   Let us first establish a loop invariant for the inner loop (lines 4--5). Since the inner loop iterates through each element of $B$, then we can say the elements of the Cartesian product $\List{A[i]} \times \List{B[1],\ldots,B[j-1]}$ have been added to $P$ at the start of each iteration.
+   Let us first establish a loop invariant for the inner loop (lines 5--7). Since the inner loop iterates through each element of $B$, then we can say the elements of the Cartesian product $\List{A[i]} \times \List{B[1],\ldots,B[j-1]}$ have been added to $P$ at the start of each iteration.
 
-   To establish a loop invariant for the outer loop (lines 3--5), we can use the termination property of the loop invariant for the inner loop. Recall that when the inner loop terminates, the invariant states that the elements of the Cartesian product $\List{A[i]} \times B$ have been added to $P$. So at the start of each iteration in the outer loop, we can say that $P$ contains the elements of $\List{A[1],\ldots,A[i-1]} \times B$.
+   To establish a loop invariant for the outer loop (lines 4--7), we can use the termination property of the loop invariant for the inner loop. Recall that when the inner loop terminates, the invariant states that the elements of the Cartesian product $\List{A[i]} \times B$ have been added to $P$. So at the start of each iteration in the outer loop, we can say that the non-empty part of $P$ contains the elements of $\List{A[1],\ldots,A[i-1]} \times B$.
 
    Then by the end of the outer loop, $P$ contains the elements of $A \times B$, which is what we want the algorithm to return.
 
@@ -352,31 +362,60 @@ There may be cases when an algorithm involves multiple loops. For nested loops, 
    \begin{itemize}
        \item Inner loop: At the start of each iteration $j$, the elements of the Cartesian product $\List{A[i]} \times \List{B[1],\ldots,B[j-1]}$ have been added to $P$.
 
-       \item Outer loop: At the start of each iteration $i$, $P$ contains the elements of the Cartesian product $\List{A[1],\ldots,A[i-1]} \times B$.
+       \item Outer loop: At the start of each iteration $i$, the non-empty part of $P$ contains the elements of the Cartesian product $\List{A[1],\ldots,A[i-1]} \times B$.
    \end{itemize}
 \end{example}
 
 \begin{exercises}
     \begin{enumerate}
-        \item Prove the following statements using induction.
+        \item Induction warmup! Prove the following statements using induction.
             \begin{enumerate}
                 \item $\displaystyle\sum_{i=1}^n i^2 = \frac{n\left(n+1\right)\left(2n+1\right)}{6}$
                 \item $\displaystyle\sum_{i=1}^n i^3 = \frac{n^2 \left(n+1\right)^2}{4}$
                 \item $1 + 2 + 4 + \cdots + 2^{n-1} = 2^n - 1$
+                \item $1 + 4 + 16 + \cdots + 4^{n-1} = \frac{1}{3} \left(4^n - 1\right)$
                 \item $n < 2^n$ for any positive integer $n$
                 \item $\left(n+1\right)^n < n^{n+1}$ for any integer $n \ge 3$
+                \item $n! > n^2$ for $n \ge 4$
+                \item $n! > \left(n/2\right)^{n/2}$
+                \item $2n+1 < n^2$ for $n \ge 3$
+                \item $3^n \ge 3n$
+                \item $3^n > 2^n + 10n$ for $n \ge 4$
             \end{enumerate}
+        
+        \item [\challenge] We can define the nonnegative powers of a number $x$ by the rules $x^0 = 1$ and $x^{n+1} = x^n \cdot x$. Explain why this defines $a^n$ for all integers $n \ge 0$. From this definition, prove that $x^m \cdot x^n = x^{m+n}$ for integers $m \ge 0$ and $n \ge 0$.
 
+        \item Consider this algorithm to find the minimum element in an array.
+            \begin{algorithm}[H]
+                \caption{Get the minimum element in the array}
+                \begin{algorithmic}[1]
+                    \Require An array $A$ of $n$ integers, where $n>0$
+                    \Ensure The minimum element in $A$
+                    \Function{ArrayMin}{$A$}
+                        \State $m \gets A[1]$
+                        \For{$i \gets 2$ to $n$}
+                            \If{$m > A[i]$}
+                                \State $m \gets A[i]$
+                            \EndIf
+                        \EndFor
+                        \Return $m$
+                    \EndFunction
+                \end{algorithmic}
+            \end{algorithm}
+        \begin{enumerate}
+            \item State the loop invariant in the algorithm.
+            \item Show that your chosen loop invariant satisfies the initialization, maintenance, and termination properties.
+        \end{enumerate}
 
-        \item Luis has designed an in-place\footnote{We say that an algorithm is \textit{in-place} if it does not consume any additional space. We will encounter this term again when we talk about sorting algorithms.} algorithm to reverse an array.
+        \item Luis has designed an in-place\footnote{We say that an algorithm is \textit{in-place} if it does not consume any additional space. We will encounter this term again when we talk about sorting algorithms.} algorithm to reverse an array. 
             \begin{algorithm}[H]
                 \caption{Reverse an array}
                 \begin{algorithmic}[1]
                     \Require An array $A$ of $n$ elements
                     \Ensure The array in reverse
                     \Function{Yarra}{$A$}
-                        \State $i \gets \lfloor\frac{n-1}{2}\rfloor$
-                        \State $j \gets \lfloor\frac{n}{2}\rfloor$
+                        \State $i \gets \lfloor \left(n-1\right)/2 \rfloor$
+                        \State $j \gets \lfloor n/2 \rfloor$
                         \While{$i \ge 1$ and $j \le n$}
                             \State \Call{Swap}{$A[i]$, $A[j]$}
                             \State $i \gets i-1$
@@ -499,7 +538,7 @@ There may be cases when an algorithm involves multiple loops. For nested loops, 
             \item Show that your chosen loop invariants each satisfy the initialization, maintenance, and termination properties.
         \end{enumerate}
 
-    \item[\challenge] Prove that the \textsc{Merge} algorithm is correct by showing that its loop invariant(as established earlier) satisfies the initialization, maintenance, and termination properties.
+    \item[\challenge] Prove that the \textsc{Merge} algorithm is correct by showing that its loop invariant (as established earlier) satisfies the initialization, maintenance, and termination properties.
 
     \item Here is a recursive algorithm to get the $n$th even number, where $0$ is the first even number.
     \begin{algorithm}[H]
