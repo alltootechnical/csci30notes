@@ -38,6 +38,7 @@
 \usepackage{metalogo}
 \usepackage{catchfile}
 \usepackage{xstring}
+\usepackage{pst-poker}
 
 % Supress microtype warnings
 \usepackage{silence}
@@ -354,6 +355,7 @@ parlead=12pt]{colophon}
 \algnewcommand\algorithmicforeach{\textbf{for each}}
 \algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
 \algrenewcommand{\algorithmiccomment}[1]{\hfill// #1}
+\newcommand{\Break}{\State \textbf{break}}
 \newcommand{\algtrue}{\textsc{true}}
 \newcommand{\algfalse}{\textsc{false}}
 \newcommand{\algnull}{\textsc{null}}
