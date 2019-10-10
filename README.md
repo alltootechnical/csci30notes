@@ -16,16 +16,16 @@ Then compile the document by running `make`.
  - **Introduction**
 	 - *Algorithms, data structures, design and implementation goals, pseudocode*
  - **The Basics**
-	 - Correctness
+	 - Correctness *(done)*
 		 - *Mathematical induction, loop invariants*
-	 - Efficiency
+	 - Efficiency *(80% done)*
 		 - *Model of computation, orders of growth, asymptotic notation*
-	 - Recursion
+	 - Recursion *(70% done)*
 		 - *Thinking recursively, recursive algorithms, divide-and-conquer, solving recurrences*
  - **Searching and Sorting**
-	 - Searching
+	 - Searching **(to be phased out by next year)**
 		 - *Linear search, binary search, jump search*
-	 - Sorting
+	 - Sorting **(to be phased out by next year)**
 		 - *Quadratic-time sorting, linearithmic-time sorting, lower bound of sorting, linear-time sorting*
 	 - Hashing
 		 - *Hash tables, collision resolution*
